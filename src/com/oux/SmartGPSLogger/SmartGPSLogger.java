@@ -55,3 +55,4 @@ public class SmartGPSLogger extends Activity
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 }
+// vi:et

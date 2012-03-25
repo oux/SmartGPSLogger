@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oux;
+package com.oux.SmartGPSLogger;
 
 public class Position
 {
@@ -34,3 +34,4 @@ public class Position
         return Math.sqrt(((p.x - x) * (p.x - x)) + (p.y - y) * (p.y - y));
     }
 }
+// vi:et

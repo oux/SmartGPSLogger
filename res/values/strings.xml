@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SmartGPSLogger</string>
+
+    <!-- Preferences -->
+    <string name="title_minfreq_preference"></string>
+    <string name="summary_minfreq_preference"></string>
+    <string name="dialog_title_minfreq_preference"></string>
+    <string name="title_maxfreq_preference"></string>
+    <string name="summary_maxfreq_preference"></string>
+    <string name="dialog_title_maxfreq_preference"></string>
+    <string name="title_mindist_preference"></string>
+    <string name="summary_mindist_preference"></string>
+    <string name="dialog_title_mindist_preference"></string>
+    <string name="title_gpstimeout_preference"></string>
+    <string name="summary_gpstimeout_preference"></string>
+    <string name="dialog_title_gpstimeout_preference"></string>
 </resources>

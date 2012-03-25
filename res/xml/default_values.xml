@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (C) 2008 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+
+<!-- This is a primitive example showing how to set default values for preferences.
+     See DefaultValues.java for more information. -->
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+            android:key="min_freq"
+            android:defaultValue="@integer/MinFreq"
+            android:title="@string/title_minfreq_preference"
+            android:summary="@string/summary_minfreq_preference"
+            android:dialogTitle="@string/dialog_title_minfreq_preference" />
+
+    <EditTextPreference
+            android:key="max_freq"
+            android:defaultValue="@integer/MaxFreq"
+            android:title="@string/title_maxfreq_preference"
+            android:summary="@string/summary_maxfreq_preference"
+            android:dialogTitle="@string/dialog_title_maxfreq_preference" />
+
+    <EditTextPreference
+            android:key="min_dist"
+            android:defaultValue="@integer/MinDist"
+            android:title="@string/title_mindist_preference"
+            android:summary="@string/summary_mindist_preference"
+            android:dialogTitle="@string/dialog_title_mindist_preference" />
+
+    <EditTextPreference
+            android:key="gps_timeout"
+            android:defaultValue="@integer/GpsTimeout"
+            android:title="@string/title_gpstimeout_preference"
+            android:summary="@string/summary_gpstimeout_preference"
+            android:dialogTitle="@string/dialog_title_gpstimeout_preference" />
+
+
+</PreferenceScreen>
+<!-- vim:et:ts=4:sw=4
+-->

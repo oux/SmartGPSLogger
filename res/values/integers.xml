@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Preferences -->
+    <integer name="MinFreq">5</integer>
+    <integer name="MaxFreq">60</integer>
+    <integer name="MinDist">500</integer>
+    <integer name="GpsTimeout">120</integer>
+</resources>

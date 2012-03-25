@@ -15,19 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.oux;
+package com.oux.SmartGPSLogger;
 
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.content.Context;
+import android.content.res.Resources;
+import com.oux.SmartGPSLogger.R;
+
 
 /* This class implements the smart wake-up policy.  */
 public class Policy
 {
-    private final int DEFAULT_MIN_FREQ = 5;
-    private final int DEFAULT_MAX_FREQ = 60;
-    private final float DEFAULT_MIN_DIST = (float)0.05;
-
-    private Context context;
+    private Context mContext;
+    private Resources mRes;
     private SharedPreferences pref;
 
     private int currentFreq;
@@ -35,10 +36,10 @@ public class Policy
 
     public Policy (Context context)
     {
-        this.context = context;
-        pref = context.getSharedPreferences(Constants.NAME,
-                                            Context.MODE_PRIVATE);
-        currentFreq = pref.getInt("min_freq", DEFAULT_MIN_FREQ);
+        mContext = context;
+        mRes = mContext.getResources();
+        pref = PreferenceManager.getDefaultSharedPreferences(mContext);
+        currentFreq = pref.getInt("min_freq", mRes.getInteger(R.integer.MinFreq));
         /* Set an improbable first previous position.  */
         prevPosition = new Position(0, 0);
     }
@@ -50,17 +51,18 @@ public class Policy
     {
         if (pos == null)
             currentFreq = Math.min(currentFreq * 2,
-                                   pref.getInt("max_freq", DEFAULT_MAX_FREQ));
+                                   pref.getInt("max_freq", mRes.getInteger(R.integer.MaxFreq)));
         else if (prevPosition.distance(pos) <= pref.getFloat("min_dist",
-                                                             DEFAULT_MIN_DIST))
+                                                             mRes.getInteger(R.integer.MinFreq)))
             currentFreq = Math.min(currentFreq * 2,
-                                   pref.getInt("max_freq", DEFAULT_MAX_FREQ));
+                                   pref.getInt("max_freq", mRes.getInteger(R.integer.MaxFreq)));
         else
             currentFreq = Math.max(currentFreq / 4,
-                                   pref.getInt("min_freq", DEFAULT_MAX_FREQ));
+                                   pref.getInt("min_freq", mRes.getInteger(R.integer.MinFreq)));
 
         prevPosition = pos;
 
         // TODO: set Service next wakeup to currentFreq
     }
 }
+// vi:et
