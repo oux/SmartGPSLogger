@@ -12,8 +12,8 @@ import android.widget.Toast;
 
 public class SmartGPSLogger extends Activity implements NmeaListener
 {
-    private static final String TAG = "SmartGPSLogger";
     private LocationManager mLm;
+    private DataWriter writer;
     // private Context mContext;
 
     /** Called when the activity is first created. */
@@ -28,12 +28,17 @@ public class SmartGPSLogger extends Activity implements NmeaListener
         LocationListener locListener = new MyLocationListener();
         mLm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
         mLm.addNmeaListener((NmeaListener)this);
+        try {
+            writer = new DataWriter();
+        } catch (java.io.IOException e) {
+            Log.e(Constants.NAME, "Failed to open file: " + e.toString());
+        }
     }
 
     @Override
     public void onNmeaReceived(long timestamp, String nmea)
     {
-        //Log.d(TAG, timestamp+"::"+nmea);
+        //Log.d(Constants.NAME, timestamp+"::"+nmea);
         Toast.makeText(getApplicationContext(),
                 timestamp+"::"+nmea,
                 Toast.LENGTH_SHORT).show();
@@ -54,6 +59,12 @@ public class SmartGPSLogger extends Activity implements NmeaListener
             Toast.makeText(getApplicationContext(),
                            Text,
                            Toast.LENGTH_SHORT).show();
+            try {
+                writer.write(loc);
+            } catch (java.io.IOException e) {
+                Log.e(Constants.NAME, "Failed to write location data : " +
+                      e.toString());
+            }
         }
 
         @Override
