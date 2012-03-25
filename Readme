@@ -1,40 +1,53 @@
+ 1 - Summary
 
- 1 - Besoins
+This is a very small Android application which aims to store GPS
+locations on the SDCARD. This application uses a "smart" and
+customizable policy to be as power efficient as possible without any
+hardware facilities.
 
-L'objectif est simple: Avoir les traces GPS pendant le voyage avec un
-autonomie maximale (minimum 4 jours). Afin d'optimiser les chances de
-succès je viens de commander une batterie double capacité. Le téléphone
-ne me servira presque qu'à ça durant le voyage.
+ 2 - Input:
 
-Nom de l'appli : SmartGPSLogger
+- minimum frequency (in minutes, default is 5)
+- maximum frequency (in minutes, default is 60)
+- distance tolerance (in meters, default is 500)
+- GPS fix timeout (in seconds, default is 120)
 
-Stockage:
-un répertoire /sdcard/SmartGPSLog/ qui contient n fichiers:
-/sdcard/SmartGPSLog/2012:05:15.gps
-/sdcard/SmartGPSLog/[...]
-/sdcard/SmartGPSLog/current.gps
-De cette façon je décharge tous les fichiers sauf le current.gps.
-Le format du fichier reste à définir. De l'ASCII serait le bienvenue.
+ 3 - Output:
 
-Fréquence:
-L'application doit permettre de positionner deux seuils (min et max) en
-minutes. Par défaut, min=5 max=60.
+Output data files are stored in /sdcard/SmartGPSLog/ (one file by day):
 
-A chaque réveil l'application doit programmer son prochain réveil. Si la
-position n'a pas changé (avec une tolérence réglable). La fréquence sera
-réajustée en la multipliant par deux et minorée par "min". Si la
-position a changé, la fréquence sera divisé par 4 et majorée par "max".
+- /sdcard/SmartGPSLog/2012:05:15.gps
+- /sdcard/SmartGPSLog/[...]
+- /sdcard/SmartGPSLog/current.gps
 
-Idéalement le service Android de l'application devra être lancée
-automatiquement au démarrage du téléphone (comme ça s'il plante et que
-le téléphone reboot les choses se remettent en place toute seule.
+No binary but ASCII data files.
 
+ 4 - Behavior - Policy
 
- 2 - Documentation
+On each wake-up, the application tries to get the current position and
+program its next wake-up as follow:
+
+- if getting the current position failed, the next wake-up is
+  programmed twice the current frequency majored by the "maximum"
+  frequency.
+
+- if the new position is close to the last one (distance tolerance),
+  the next wake-up is programmed twice the current frequency majored
+  by the maximum frequency.
+
+- if the new position is far away to the last one (distance
+  tolerance), the next wake-up is programmed the current frequency
+  divided by four and minored by the minimum frequency.
+
+Once the SmartGPSLogger application is installed, the SmartGPSLogger
+service is automatically started on phone boot.
+
+ 5 - Documentation
 
 http://developer.android.com/guide/topics/location/obtaining-user-location.html
 http://developer.android.com/reference/android/location/LocationManager.html addNmeaListener
 
- 3 - Build
+ 6 - Build
+
 $ ./mkproj.sh
 $ ant debug install
