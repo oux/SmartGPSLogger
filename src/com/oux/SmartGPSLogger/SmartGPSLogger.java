@@ -10,7 +10,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.widget.Toast;
 
-public class SmartGPSLogger extends Activity
+public class SmartGPSLogger extends Activity implements NmeaListener
 {
     private static final String TAG = "SmartGPSLogger";
     private LocationManager mLm;
@@ -21,11 +21,22 @@ public class SmartGPSLogger extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main);
 
         mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locListener = new MyLocationListener();
         mLm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locListener);
+        mLm.addNmeaListener((NmeaListener)this);
+    }
+
+    @Override
+    public void onNmeaReceived(long timestamp, String nmea)
+    {
+        //Log.d(TAG, timestamp+"::"+nmea);
+        Toast.makeText(getApplicationContext(),
+                timestamp+"::"+nmea,
+                Toast.LENGTH_SHORT).show();
     }
 
     public class MyLocationListener implements LocationListener
@@ -55,3 +66,4 @@ public class SmartGPSLogger extends Activity
         public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 }
+// vi:et
