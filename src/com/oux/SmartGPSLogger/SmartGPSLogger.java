@@ -10,9 +10,9 @@ import android.content.Context;
 
 public class SmartGPSLogger extends Activity implements NmeaListener
 {
-	private static final String TAG = "SmartGPSLogger";
-	private LocationManager mLm;
-	// private Context mContext;
+    private static final String TAG = "SmartGPSLogger";
+    private LocationManager mLm;
+    // private Context mContext;
 
     /** Called when the activity is first created. */
     @Override
@@ -20,13 +20,13 @@ public class SmartGPSLogger extends Activity implements NmeaListener
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-		mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mLm.addNmeaListener((NmeaListener)this);
+        mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mLm.addNmeaListener((NmeaListener)this);
     }
 
-	@Override
-	public void onNmeaReceived(long timestamp, String nmea)
-	{
-		Log.d(TAG, timestamp+"::"+nmea);
-	}
+    @Override
+    public void onNmeaReceived(long timestamp, String nmea)
+    {
+        Log.d(TAG, timestamp+"::"+nmea);
+    }
 }
