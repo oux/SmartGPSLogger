@@ -7,9 +7,9 @@ hardware facilities.
 
  2 - Input:
 
-- minimum frequency (in minutes, default is 5)
-- maximum frequency (in minutes, default is 60)
-- distance tolerance (in meters, default is 500)
+- minimum frequency ("min_freq" in minutes, default is 5)
+- maximum frequency ("max_freq" in minutes, default is 60)
+- distance tolerance ("min_dist" in meters, default is 500)
 - GPS fix timeout (in seconds, default is 120)
 
  3 - Output:
