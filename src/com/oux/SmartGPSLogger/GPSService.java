@@ -36,7 +36,7 @@ public class GPSService extends Service
     private Object lock;
     private LocationManager mLm;
     private LocationListener mLl;
-    private Location loc;
+    private Location curLoc;
     private DataWriter writer;
     private Policy policy;
 
@@ -69,9 +69,10 @@ public class GPSService extends Service
                     mLm.requestSingleUpdate(LocationManager.GPS_PROVIDER, mLl, null);
                     try {
                         lock.wait(60000);
-                        policy.setNextWakeUp(loc); // TODO: need some work
+                        policy.setNextWakeUp(curLoc); // TODO: need some work
                     } catch (java.lang.InterruptedException e) {
                         policy.setNextWakeUp(null); // TODO: need some work
+                        mLm.removeUpdates(mLl);
                     }
                     wakelock.release();
                     GPSService.this.stopSelf();
@@ -100,6 +101,8 @@ public class GPSService extends Service
                 Log.e(TAG, "Failed to write location data : " +
                       e.toString());
             }
+            curLoc = loc;
+            lock.notify();
         }
 
         @Override
