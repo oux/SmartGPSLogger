@@ -46,8 +46,10 @@ service is automatically started on phone boot.
 
 http://developer.android.com/guide/topics/location/obtaining-user-location.html
 http://developer.android.com/reference/android/location/LocationManager.html addNmeaListener
+http://www.jjoe64.com/2011/06/autostart-service-on-device-boot.html
 
  6 - Build
 
 $ ./mkproj.sh
 $ ant debug install
+
