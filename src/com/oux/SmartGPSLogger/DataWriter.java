@@ -77,12 +77,5 @@ public class DataWriter
         writer.flush();         // TODO: Flush on each line is fine
                                 // but use a BufferedWriter to flush
                                 // on each line is ugly
-
-        Log.d("DateWriter", DateFormat.format("yyyy:MM:dd", loc.getTime()) +
-              "," + DateFormat.format("hh:mm:ss", loc.getTime()) +
-              "," + loc.getLatitude() +
-              "," + loc.getLongitude() +
-              "," + loc.getSpeed() +
-              "," + loc.getAltitude() + " wroten");
     }
 }
