@@ -69,7 +69,7 @@ public class DataWriter
         }
 
         writer.write(DateFormat.format("yyyy:MM:dd", loc.getTime()) +
-                     "," + DateFormat.format("hh:mm:ss", loc.getTime()) +
+                     "," + DateFormat.format("kk:mm:ss", loc.getTime()) +
                      "," + loc.getLatitude() +
                      "," + loc.getLongitude() +
                      "," + loc.getSpeed() +
