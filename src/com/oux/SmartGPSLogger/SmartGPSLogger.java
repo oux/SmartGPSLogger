@@ -33,43 +33,43 @@ public class SmartGPSLogger extends Activity
     }
 
     @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            super.onCreateOptionsMenu(menu);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
 
-            menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
-                .setIcon(R.drawable.ic_reclog)
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
-            menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
-                .setIcon(R.drawable.ic_stoplog)
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
-            menu.add(0, MENU_PLAYLOG, 0, R.string.menu_playlog)
-                .setIcon(R.drawable.ic_playlog)
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
-            menu.add(0, MENU_SETTINGS, 0, R.string.menu_settings)
-                .setIcon(android.R.drawable.ic_menu_preferences)
-                .setIntent(new Intent(this,Preferences.class))
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
+            .setIcon(R.drawable.ic_reclog)
+            .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
+            .setIcon(R.drawable.ic_stoplog)
+            .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        menu.add(0, MENU_PLAYLOG, 0, R.string.menu_playlog)
+            .setIcon(R.drawable.ic_playlog)
+            .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        menu.add(0, MENU_SETTINGS, 0, R.string.menu_settings)
+            .setIcon(android.R.drawable.ic_menu_preferences)
+            .setIntent(new Intent(this,Preferences.class))
+            .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case MENU_RECLOG:
+            this.startService(mService);
+            Log.d(TAG, "started");
+            return true;
+        case MENU_STOPLOG:
+            this.stopService(mService);
+            Log.d(TAG, "stopped");
+            return true;
+        case MENU_PLAYLOG:
+            // START MAP ACTIVITY
             return true;
         }
 
-    @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            switch (item.getItemId()) {
-                case MENU_RECLOG:
-                    this.startService(mService);
-                    Log.d(TAG, "started");
-                    return true;
-                case MENU_STOPLOG:
-                    this.stopService(mService);
-                    Log.d(TAG, "stopped");
-                    return true;
-                case MENU_PLAYLOG:
-                    // START MAP ACTIVITY
-                    return true;
-            }
-
-            return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }
 // vi:et
