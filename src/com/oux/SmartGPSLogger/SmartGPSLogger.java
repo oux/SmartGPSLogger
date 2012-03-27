@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.content.Context;
+import android.content.Intent;
 
 public class SmartGPSLogger extends Activity
 {
@@ -16,6 +17,10 @@ public class SmartGPSLogger extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        Intent service = new Intent(this, GPSService.class);
+		this.startService(service);
+        Log.d(TAG, "started");
     }
 }
 // vi:et
