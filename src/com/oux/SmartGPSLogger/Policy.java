@@ -39,7 +39,8 @@ public class Policy
         mContext = context;
         mRes = mContext.getResources();
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        currentFreq = pref.getInt("min_freq", mRes.getInteger(R.integer.MinFreq));
+        currentFreq = Integer.valueOf(pref.getString("min_freq", Integer.toString(
+                        mRes.getInteger(R.integer.MinFreq))));
     }
 
     /* Set the next wake-up taking into account the current location
@@ -51,14 +52,20 @@ public class Policy
             /* Keep currentFreq unchanged */;
         else if (loc == null)
             currentFreq = Math.min(currentFreq * 2,
-                                   pref.getInt("max_freq", mRes.getInteger(R.integer.MaxFreq)));
-        else if (prevLocation.distanceTo(loc) <= pref.getFloat("min_dist",
-                                                               mRes.getInteger(R.integer.MinFreq)))
+                                   Integer.valueOf(
+                                       pref.getString("max_freq", Integer.toString(
+                                           mRes.getInteger(R.integer.MaxFreq)))));
+        else if (prevLocation.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist", Integer.toString(
+                                                               mRes.getInteger(R.integer.MinDist)))))
             currentFreq = Math.min(currentFreq * 2,
-                                   pref.getInt("max_freq", mRes.getInteger(R.integer.MaxFreq)));
+                                   Integer.valueOf(
+                                       pref.getString("max_freq", Integer.toString(
+                                               mRes.getInteger(R.integer.MaxFreq)))));
         else
             currentFreq = Math.max(currentFreq / 4,
-                                   pref.getInt("min_freq", mRes.getInteger(R.integer.MinFreq)));
+                                   Integer.valueOf(
+                                       pref.getString("min_freq", Integer.toString(
+                                               mRes.getInteger(R.integer.MinFreq)))));
 
         prevLocation = loc;
 

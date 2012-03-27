@@ -24,6 +24,7 @@
             android:defaultValue="@integer/MinFreq"
             android:title="@string/title_minfreq_preference"
             android:summary="@string/summary_minfreq_preference"
+            android:numeric="integer"
             android:dialogTitle="@string/dialog_title_minfreq_preference" />
 
     <EditTextPreference
@@ -31,6 +32,7 @@
             android:defaultValue="@integer/MaxFreq"
             android:title="@string/title_maxfreq_preference"
             android:summary="@string/summary_maxfreq_preference"
+            android:numeric="integer"
             android:dialogTitle="@string/dialog_title_maxfreq_preference" />
 
     <EditTextPreference
@@ -38,6 +40,7 @@
             android:defaultValue="@integer/MinDist"
             android:title="@string/title_mindist_preference"
             android:summary="@string/summary_mindist_preference"
+            android:numeric="integer"
             android:dialogTitle="@string/dialog_title_mindist_preference" />
 
     <EditTextPreference
@@ -45,6 +48,7 @@
             android:defaultValue="@integer/GpsTimeout"
             android:title="@string/title_gpstimeout_preference"
             android:summary="@string/summary_gpstimeout_preference"
+            android:numeric="integer"
             android:dialogTitle="@string/dialog_title_gpstimeout_preference" />
 
 
