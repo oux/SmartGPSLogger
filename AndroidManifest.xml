@@ -28,7 +28,8 @@
 	<receiver android:name=".IntentReceiver">  
 	  <intent-filter>  
 	    <action android:name="android.intent.action.BOOT_COMPLETED" />  
-	    <action android:name="com.oux.GET_NEW_LOCATION" />  
+	    <action android:name="com.oux.REQUEST_NEW_LOCATION" />  
+	    <action android:name="com.oux.NEW_LOCATION_REQUESTED" />  
 	  </intent-filter>  
 	</receiver>  
         <service android:name=".GPSService"/>
