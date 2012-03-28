@@ -23,7 +23,6 @@
             android:key="min_freq"
             android:defaultValue="@string/MinFreq"
             android:title="@string/title_minfreq_preference"
-            android:summary="@string/summary_minfreq_preference"
             android:numeric="integer"
             android:dialogTitle="@string/dialog_title_minfreq_preference" />
 
@@ -31,7 +30,6 @@
             android:key="max_freq"
             android:defaultValue="@string/MaxFreq"
             android:title="@string/title_maxfreq_preference"
-            android:summary="@string/summary_maxfreq_preference"
             android:numeric="integer"
             android:dialogTitle="@string/dialog_title_maxfreq_preference" />
 
@@ -39,7 +37,6 @@
             android:key="min_dist"
             android:defaultValue="@string/MinDist"
             android:title="@string/title_mindist_preference"
-            android:summary="@string/summary_mindist_preference"
             android:numeric="integer"
             android:dialogTitle="@string/dialog_title_mindist_preference" />
 
@@ -47,9 +44,14 @@
             android:key="gps_timeout"
             android:defaultValue="@string/GpsTimeout"
             android:title="@string/title_gpstimeout_preference"
-            android:summary="@string/summary_gpstimeout_preference"
             android:numeric="integer"
             android:dialogTitle="@string/dialog_title_gpstimeout_preference" />
+
+    <CheckBoxPreference
+            android:key="onboot"
+            android:defaultValue="true"
+            android:title="@string/title_onboot_preference"
+            android:summary="@string/summary_onboot_preference" />
 
 
 </PreferenceScreen>

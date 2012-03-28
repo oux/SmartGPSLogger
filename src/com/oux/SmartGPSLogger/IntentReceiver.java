@@ -44,13 +44,18 @@ public class IntentReceiver extends BroadcastReceiver {
         
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) ||
             REQUEST_NEW_LOCATION.equals(intent.getAction())) {
-            Intent service = new Intent(context, GPSService.class);
-            context.startService(new Intent(context, GPSService.class));
-            if (!wakelock.isHeld())
-                wakelock.acquire();
+
+            SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+            if (pref.getBoolean("onboot",true)) {
+                Intent service = new Intent(context, GPSService.class);
+                context.startService(new Intent(context, GPSService.class));
+                if (!wakelock.isHeld())
+                    wakelock.acquire();
+            }
 
         } else if (NEW_LOCATION_REQUESTED.equals(intent.getAction()))
             if (wakelock.isHeld())
                 wakelock.release();
     }
 }
+// vi:et

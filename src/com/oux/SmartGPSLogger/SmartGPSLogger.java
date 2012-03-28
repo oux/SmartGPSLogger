@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
 import android.app.SearchManager;
 
 public class SmartGPSLogger extends Activity
@@ -22,12 +24,17 @@ public class SmartGPSLogger extends Activity
     private DataWriter writer;
     private Intent mService;
 
+    // UI
+    private TextView mCurrentFreq;
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        mCurrentFreq = (TextView) findViewById(R.id.currentFreq);
 
         mService = new Intent(this, GPSService.class);
     }

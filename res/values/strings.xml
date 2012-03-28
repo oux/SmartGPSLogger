@@ -15,18 +15,18 @@
 
     <!-- Preferences -->
     <string name="title_minfreq_preference">minimum frequency</string>
-    <string name="summary_minfreq_preference">Default: 5</string>
     <string name="dialog_title_minfreq_preference">minimum frequency</string>
 
     <string name="title_maxfreq_preference">maximum frequency</string>
-    <string name="summary_maxfreq_preference">Default: 60</string>
     <string name="dialog_title_maxfreq_preference">maximum frequency</string>
 
     <string name="title_mindist_preference">distance tolerance</string>
-    <string name="summary_mindist_preference">Default: 500</string>
     <string name="dialog_title_mindist_preference">distance tolerance</string>
 
     <string name="title_gpstimeout_preference">GPS fix timeout</string>
     <string name="summary_gpstimeout_preference">Default: 120</string>
     <string name="dialog_title_gpstimeout_preference">GPS fix timeout</string>
+
+    <string name="title_onboot_preference">Activate logger on boot</string>
+    <string name="summary_onboot_preference">Activate logger on boot</string>
 </resources>

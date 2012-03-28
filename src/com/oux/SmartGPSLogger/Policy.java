@@ -45,8 +45,8 @@ public class Policy
         mContext = context;
         mRes = mContext.getResources();
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        currentFreq = Integer.valueOf(pref.getString("min_freq", Integer.toString(
-                        mRes.getInteger(R.integer.MinFreq))));
+        currentFreq = Integer.valueOf(pref.getString("min_freq",
+                        mRes.getString(R.string.MinFreq)));
         am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
     }
 
@@ -62,21 +62,18 @@ public class Policy
             Log.d(TAG, "setNextWakeUp: loc is null");
             currentFreq = Math.min(currentFreq * 2,
                                    Integer.valueOf(
-                                       pref.getString("max_freq", Integer.toString(
-                                           mRes.getInteger(R.integer.MaxFreq)))));
-        } else if (prevLocation.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist", Integer.toString(
-                                                               mRes.getInteger(R.integer.MinDist))))) {
+                                       pref.getString("max_freq", mRes.getString(R.string.MaxFreq))));
+        } else if (prevLocation.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist",
+                                                               mRes.getString(R.string.MinDist)))) {
             Log.d(TAG, "setNextWakeUp: short distance");
             currentFreq = Math.min(currentFreq * 2,
                                    Integer.valueOf(
-                                       pref.getString("max_freq", Integer.toString(
-                                               mRes.getInteger(R.integer.MaxFreq)))));
+                                       pref.getString("max_freq", mRes.getString(R.string.MaxFreq))));
         } else {
             Log.d(TAG, "setNextWakeUp: last case");
             currentFreq = Math.max(currentFreq / 4,
                                    Integer.valueOf(
-                                       pref.getString("min_freq", Integer.toString(
-                                               mRes.getInteger(R.integer.MinFreq)))));
+                                       pref.getString("min_freq", mRes.getString(R.string.MinFreq))));
         }
         prevLocation = loc;
         Intent intent = new Intent();
