@@ -46,7 +46,6 @@ public class GPSService extends Service implements LocationListener
     private Policy policy;
     private Timer timer;
     private TimerTask timeout;
-    private final IBinder binder = new GPSBinder();
 
     @Override
     public void onCreate()
@@ -138,12 +137,6 @@ public class GPSService extends Service implements LocationListener
 
     @Override
 	public IBinder onBind(Intent intent) {
-		return binder;
-	}
-
-	public class GPSBinder extends Binder {
-		GPSService getService() {
-			return GPSService.this;
-		}
+		return null;
 	}
 }
