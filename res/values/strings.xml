@@ -2,6 +2,11 @@
 <resources>
     <string name="app_name">Smart GPS Logger</string>
 
+    <string name="MinFreq">3</string>
+    <string name="MaxFreq">30</string>
+    <string name="MinDist">500</string>
+    <string name="GpsTimeout">120</string>
+
     <!-- Preferences -->
     <string name="menu_reclog">Start recording</string>
     <string name="menu_stoplog">Stop recording</string>
