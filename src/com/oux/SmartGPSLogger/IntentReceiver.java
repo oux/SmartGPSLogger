@@ -24,17 +24,33 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.os.PowerManager;
 
 public class IntentReceiver extends BroadcastReceiver {
     private static final String TAG = "IntentReceiver";
+    private static PowerManager.WakeLock wakelock;
 
-    public static final String GET_NEW_LOCATION = "com.oux.GET_NEW_LOCATION";
+    public static final String REQUEST_NEW_LOCATION = "com.oux.REQUEST_NEW_LOCATION";
+    public static final String NEW_LOCATION_REQUESTED = "com.oux.NEW_LOCATION_REQUESTED";
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) ||
-            GET_NEW_LOCATION.equals(intent.getAction())) {
-            context.startService(new Intent(context, GPSService.class));
+        Log.d("IntentReceiver", "intent received : " + intent.getAction());
+        if (wakelock == null) {
+            PowerManager pm = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
+            wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                                      "GPSIntentReceiver");
         }
+        
+        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) ||
+            REQUEST_NEW_LOCATION.equals(intent.getAction())) {
+            Intent service = new Intent(context, GPSService.class);
+            context.startService(new Intent(context, GPSService.class));
+            if (!wakelock.isHeld())
+                wakelock.acquire();
+
+        } else if (NEW_LOCATION_REQUESTED.equals(intent.getAction()))
+            if (wakelock.isHeld())
+                wakelock.release();
     }
 }

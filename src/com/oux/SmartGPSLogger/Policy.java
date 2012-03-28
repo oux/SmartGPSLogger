@@ -23,16 +23,22 @@ import android.content.Context;
 import android.content.res.Resources;
 import com.oux.SmartGPSLogger.R;
 import android.location.Location;
+import android.app.AlarmManager;
+import android.content.Intent;
+import android.app.PendingIntent;
+import android.util.Log;
 
 /* This class implements the smart wake-up policy.  */
 public class Policy
 {
+    private static final String TAG = "GPSPolicy";
     private Context mContext;
     private Resources mRes;
     private SharedPreferences pref;
 
     private int currentFreq;
     private Location prevLocation = null;
+    private AlarmManager am;
 
     public Policy (Context context)
     {
@@ -41,6 +47,7 @@ public class Policy
         pref = PreferenceManager.getDefaultSharedPreferences(mContext);
         currentFreq = Integer.valueOf(pref.getString("min_freq", Integer.toString(
                         mRes.getInteger(R.integer.MinFreq))));
+        am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
     }
 
     /* Set the next wake-up taking into account the current location
@@ -48,28 +55,38 @@ public class Policy
      * frequency.  */
     public void setNextWakeUp (Location loc)
     {
-        if (prevLocation == null)
-            /* Keep currentFreq unchanged */;
-        else if (loc == null)
+        if (prevLocation == null && loc != null)
+            Log.d(TAG, "setNextWakeUp: prevLocation is null and loc is NOT null");
+            /* Keep currentFreq unchanged */
+        else if (loc == null) {
+            Log.d(TAG, "setNextWakeUp: loc is null");
             currentFreq = Math.min(currentFreq * 2,
                                    Integer.valueOf(
                                        pref.getString("max_freq", Integer.toString(
                                            mRes.getInteger(R.integer.MaxFreq)))));
-        else if (prevLocation.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist", Integer.toString(
-                                                               mRes.getInteger(R.integer.MinDist)))))
+        } else if (prevLocation.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist", Integer.toString(
+                                                               mRes.getInteger(R.integer.MinDist))))) {
+            Log.d(TAG, "setNextWakeUp: short distance");
             currentFreq = Math.min(currentFreq * 2,
                                    Integer.valueOf(
                                        pref.getString("max_freq", Integer.toString(
                                                mRes.getInteger(R.integer.MaxFreq)))));
-        else
+        } else {
+            Log.d(TAG, "setNextWakeUp: last case");
             currentFreq = Math.max(currentFreq / 4,
                                    Integer.valueOf(
                                        pref.getString("min_freq", Integer.toString(
                                                mRes.getInteger(R.integer.MinFreq)))));
-
+        }
         prevLocation = loc;
-
-        // TODO: set Service next wakeup to currentFreq
+        Intent intent = new Intent();
+        intent.setAction(IntentReceiver.REQUEST_NEW_LOCATION);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
+                                                                 intent,
+                                                                 PendingIntent.FLAG_ONE_SHOT);
+        am.set(AlarmManager.RTC_WAKEUP,
+               System.currentTimeMillis() + (currentFreq * 60 * 1000), pendingIntent);
+        Log.d(TAG, "will wake-up " + currentFreq + " minutes");
     }
 }
 // vi:et

@@ -24,18 +24,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.content.Context;
-import android.widget.Toast;
 import android.util.Log;
 import android.content.Intent;
-import android.os.IBinder;
 import android.os.Looper;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.os.IBinder;
+import android.os.Binder;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 
 public class GPSService extends Service implements LocationListener
 {
     private static final String TAG = "GPSService";
-    private PowerManager.WakeLock wakelock;
+    public static PowerManager.WakeLock wakelock;
     private Object lock = new Object();
     private LocationManager mLm;
     private LocationListener mLl;
@@ -44,19 +46,15 @@ public class GPSService extends Service implements LocationListener
     private Policy policy;
     private Timer timer;
     private TimerTask timeout;
-
-    public IBinder onBind(Intent intent)
-    {
-        return null;
-    }
+    private final IBinder binder = new GPSBinder();
 
     @Override
     public void onCreate()
     {
         super.onCreate();
-        Log.d(TAG, "created");
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "SmartGPSLogger");
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                                  "SmartGPSLogger");
 
         mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
@@ -68,27 +66,40 @@ public class GPSService extends Service implements LocationListener
 
         policy = new Policy(this);
         timer = new Timer("timeout", true);
-        timeout = new TimerTask() {
-                public void run () {
-                    GPSService.this.timeout();
-                }};
-
-        startService();
     }
 
-    private void startService ()
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
     {
-        wakelock.acquire();
-        Log.d(TAG, "ask location update");
-        mLm.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
-        timer.schedule(timeout, 60000);
+        if (!wakelock.isHeld())
+            getNewLocation();
+        return Service.START_STICKY;
+    }
+
+    public void getNewLocation()
+    {
+        Log.d(TAG, "ask for location update");
+        if (!wakelock.isHeld()) {
+            wakelock.acquire();
+
+            Intent intent = new Intent();
+            intent.setAction(IntentReceiver.NEW_LOCATION_REQUESTED);
+            sendBroadcast(intent);
+            mLm.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
+            timeout = new TimerTask() {
+                    public void run () {
+                        GPSService.this.timeout();
+                    }};
+            timer.schedule(timeout, 60000);
+        }
     }
 
     private void timeout ()
-    { 
+    {
+        policy.setNextWakeUp(null);
+        mLm.removeUpdates(GPSService.this);
         wakelock.release();
         Log.d(TAG, "timeout fired");
-        mLm.removeUpdates(GPSService.this);
     }
 
     @Override
@@ -112,9 +123,10 @@ public class GPSService extends Service implements LocationListener
             Log.e(TAG, "Failed to write location data : " +
                   e.toString());
         }
+        policy.setNextWakeUp(loc);
         wakelock.release();
     }
-            
+
     @Override
     public void onProviderDisabled(String provider) {}
 
@@ -123,4 +135,15 @@ public class GPSService extends Service implements LocationListener
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {}
+
+    @Override
+	public IBinder onBind(Intent intent) {
+		return binder;
+	}
+
+	public class GPSBinder extends Binder {
+		GPSService getService() {
+			return GPSService.this;
+		}
+	}
 }
