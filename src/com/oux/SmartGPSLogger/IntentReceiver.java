@@ -42,7 +42,7 @@ public class IntentReceiver extends BroadcastReceiver {
                                       "GPSIntentReceiver");
         }
         
-        if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction()) ||
+        if ("android.intent.action.MEDIA_MOUNTED".equals(intent.getAction()) ||
             REQUEST_NEW_LOCATION.equals(intent.getAction())) {
 
             SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);

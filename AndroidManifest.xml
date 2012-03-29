@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application android:label="SmartGPSLoggerApplication"
         android:persistent="true"
         android:icon="@drawable/feet">
@@ -25,13 +24,16 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-	<receiver android:name=".IntentReceiver">  
-	  <intent-filter>  
-	    <action android:name="android.intent.action.BOOT_COMPLETED" />  
-	    <action android:name="com.oux.REQUEST_NEW_LOCATION" />  
-	    <action android:name="com.oux.NEW_LOCATION_REQUESTED" />  
-	  </intent-filter>  
-	</receiver>  
+	<receiver android:name=".IntentReceiver">
+	  <intent-filter>
+	    <action android:name="com.oux.REQUEST_NEW_LOCATION" />
+	    <action android:name="com.oux.NEW_LOCATION_REQUESTED" />
+	  </intent-filter>
+	  <intent-filter>
+	    <action android:name="android.intent.action.MEDIA_MOUNTED" />
+	    <data android:scheme="file" />
+	  </intent-filter>
+	</receiver>
         <service android:name=".GPSService"/>
     </application>
 </manifest>
