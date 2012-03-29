@@ -65,6 +65,7 @@ public class DataWriter
         {
             writer.close();
             file.renameTo(new File(DIR + lastLocDate + ".txt"));
+            lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
             openCurrent();
         }
 
@@ -77,5 +78,12 @@ public class DataWriter
         writer.flush();         // TODO: Flush on each line is fine
                                 // but use a BufferedWriter to flush
                                 // on each line is ugly
+    }
+
+    public void log(String message) throws java.io.IOException
+    {
+        writer.write(DateFormat.format("yyyy:MM:dd kk:mm:ss", System.currentTimeMillis())
+                     + "   " + message + "\n");
+        writer.flush();
     }
 }
