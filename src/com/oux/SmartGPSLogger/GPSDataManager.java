@@ -24,11 +24,12 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import android.text.format.DateFormat;
 import android.util.Log;
+import java.util.LinkedList;
 
-public class DataWriter
+public class GPSDataManager
 {
     private final String DIR = "/sdcard/SmartGPSLogger/";
-    private final String SUFFIX = ".txt";
+    private final String SUFFIX = ".log";
     private final String CURRENT = DIR + "current" + SUFFIX;
     private final String FMT = "yyyy-MM-dd";
 
@@ -36,6 +37,7 @@ public class DataWriter
     private String lastLocDate = null;
     private File file;
     private BufferedWriter writer;
+    private LinkedList<Location> locations;
 
     private void openCurrent() throws java.io.IOException
     {
@@ -43,10 +45,16 @@ public class DataWriter
         writer = new BufferedWriter(new FileWriter(file, true));
     }
 
-    public DataWriter(Debug debug) throws java.io.IOException
+    private void loadLocations() throws java.io.IOException
+    {
+        // TODO: implement it
+    }
+
+    public GPSDataManager(Debug debug) throws java.io.IOException
     {
         this.debug = debug;
 
+        locations = new LinkedList<Location>();
         File root = Environment.getExternalStorageDirectory();
         if (root.canWrite())
         {
@@ -55,7 +63,10 @@ public class DataWriter
                 throw new java.io.IOException("Failed to create " + DIR +
                                               " directory");
             else
+            {
+                loadLocations();
                 openCurrent();
+            }
         }
     }
 
@@ -65,8 +76,22 @@ public class DataWriter
         super.finalize();
     }
 
-    public void write(Location loc) throws java.io.IOException
+    public Location getLastLocation()
     {
+        return locations.size() > 0 ? locations.getLast() : null;
+    }
+
+    public LinkedList<Location> getLocations()
+    {
+        return locations;
+    }
+
+    public void addNewLocation(Location loc)
+    {
+        locations.add(loc);
+        if (locations.size() > 100) // TODO: use a preference
+            locations.removeFirst();
+
         String newLocDate = DateFormat.format(FMT, loc.getTime()).toString();
 
         if (lastLocDate == null)
@@ -74,10 +99,15 @@ public class DataWriter
 
         if (!lastLocDate.equals(newLocDate))
         {
-            writer.close();
-            file.renameTo(new File(DIR + lastLocDate + ".txt"));
-            lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
-            openCurrent();
+            try {
+                debug.log("Process file rotation");
+                writer.close();
+                file.renameTo(new File(DIR + lastLocDate + ".txt"));
+                lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
+                openCurrent();
+            } catch (java.io.IOException e) {
+                debug.log("File rotation failed : " + e.toString());
+            }
         }
 
         String newLine = DateFormat.format("yyyy:MM:dd", loc.getTime()) +
@@ -85,12 +115,16 @@ public class DataWriter
             "," + loc.getLatitude() +
             "," + loc.getLongitude() +
             "," + loc.getSpeed() +
-            "," + loc.getAltitude() + "\n";
+            "," + loc.getAltitude();
 
-        writer.write(newLine);
-        writer.flush();         // TODO: Flush on each line is fine
-                                // but use a BufferedWriter to flush
-                                // on each line is ugly
+        try {
+            writer.write(newLine  + "\n");
+            writer.flush();
+        } catch (java.io.IOException e) {
+            debug.log("Failed to write location data : " +
+                      e.toString());
+        }
+
         debug.log(newLine);
     }
 }

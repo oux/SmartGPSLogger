@@ -42,7 +42,7 @@ public class GPSService extends Service implements LocationListener
     private static final String TAG = "GPSService";
     public static PowerManager.WakeLock wakelock;
     private LocationManager mLm;
-    private DataWriter writer;
+    private GPSDataManager data;
     private Policy policy;
     private Timer timer;
     private TimerTask timeout;
@@ -58,7 +58,7 @@ public class GPSService extends Service implements LocationListener
 
         try {
             debug = new Debug();
-            writer = new DataWriter(debug);
+            data = new GPSDataManager(debug);
         } catch (java.io.IOException e) {
             stopSelf();
             ready = false;
@@ -113,7 +113,7 @@ public class GPSService extends Service implements LocationListener
     {
         debug.log("timeout fired");
         mLm.removeUpdates(GPSService.this);
-        int nextTime = policy.setNextWakeUp(null);
+        policy.setNextWakeUp(data.getLastLocation(), null);
         wakelock.release();
     }
 
@@ -132,15 +132,10 @@ public class GPSService extends Service implements LocationListener
     {
         debug.log("new location found");
         timeout.cancel();
-        try {
-            writer.write(loc);
-        } catch (java.io.IOException e) {
-            Log.e(TAG, "Failed to write location data : " +
-                  e.toString());
-        }
+        Location prev = data.getLastLocation();
+        data.addNewLocation(loc);
         mLm.removeUpdates(GPSService.this);
-        int nextTime = policy.setNextWakeUp(loc);
-        debug.log("will wake up in " + nextTime + " minutes");
+        policy.setNextWakeUp(prev, loc);
         wakelock.release();
     }
 

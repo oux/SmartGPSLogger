@@ -36,7 +36,6 @@ public class Policy
     private SharedPreferences pref;
 
     private int currentFreq;
-    private Location prevLocation = null;
     private AlarmManager am;
     private Debug debug;
 
@@ -54,19 +53,19 @@ public class Policy
     /* Set the next wake-up taking into account the current location
      * LOC (could be null), the previous position and the current
      * frequency.  */
-    public int setNextWakeUp (Location loc)
+    public int setNextWakeUp (Location prev, Location cur)
     {
-        if (prevLocation == null && loc != null)
-            debug.log("prevLocation is null and loc is NOT null");
+        if (prev == null && cur != null)
+            debug.log("prev is null and cur is NOT null");
             /* Keep currentFreq unchanged */
-        else if (loc == null) {
-            debug.log("loc is null");
+        else if (cur == null) {
+            debug.log("cur is null");
             currentFreq = Math.min(currentFreq * 2,
                                    Integer.valueOf(
                                        pref.getString("max_freq", mRes.getString(R.string.MaxFreq))));
-        } else if (prevLocation.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist",
+        } else if (prev.distanceTo(cur) <= Float.valueOf(pref.getString("min_dist",
                                                                mRes.getString(R.string.MinDist)))) {
-            debug.log("short distance");
+            debug.log("prev and cur are very close");
             currentFreq = Math.min(currentFreq * 2,
                                    Integer.valueOf(
                                        pref.getString("max_freq", mRes.getString(R.string.MaxFreq))));
@@ -76,7 +75,6 @@ public class Policy
                                    Integer.valueOf(
                                        pref.getString("min_freq", mRes.getString(R.string.MinFreq))));
         }
-        prevLocation = loc;
         Intent intent = new Intent();
         intent.setAction(IntentReceiver.REQUEST_NEW_LOCATION);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
