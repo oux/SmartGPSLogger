@@ -56,19 +56,19 @@ public class Preferences extends PreferenceActivity {
         Resources res = getResources();
         EditTextPreference etp = (EditTextPreference) findPreference("min_freq");
         etp.setSummary("Default: " + res.getString(R.string.MinFreq) +
-                       " Current: " + pref.getString("min_freq",
+                       ", current: " + pref.getString("min_freq",
                            res.getString(R.string.MinFreq)));
         etp = (EditTextPreference) findPreference("max_freq");
         etp.setSummary("Default: " + res.getString(R.string.MaxFreq) +
-                       " Current: " + pref.getString("max_freq",
+                       ", current: " + pref.getString("max_freq",
                            res.getString(R.string.MaxFreq)));
         etp = (EditTextPreference) findPreference("min_dist");
         etp.setSummary("Default: " + res.getString(R.string.MinDist) +
-                       " Current: " + pref.getString("min_dist",
+                       ", current: " + pref.getString("min_dist",
                            res.getString(R.string.MinDist)));
         etp = (EditTextPreference) findPreference("gps_timeout");
         etp.setSummary("Default: " + res.getString(R.string.GpsTimeout) +
-                       " Current: " + pref.getString("gps_timeout",
+                       ", current: " + pref.getString("gps_timeout",
                            res.getString(R.string.GpsTimeout)));
     }
 
