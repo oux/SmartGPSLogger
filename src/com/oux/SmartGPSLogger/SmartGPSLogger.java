@@ -9,7 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import com.google.android.maps.MapActivity;
+import com.google.android.maps.MapView;
 import android.app.SearchManager;
+import com.google.android.maps.MyLocationOverlay;
 
 public class SmartGPSLogger extends MapActivity
 {
@@ -23,6 +25,7 @@ public class SmartGPSLogger extends MapActivity
 
     private DataWriter writer;
     private Intent mService;
+    private MyLocationOverlay me;
 
     /** Called when the activity is first created. */
     @Override
@@ -31,12 +34,31 @@ public class SmartGPSLogger extends MapActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        MapView map = (MapView)findViewById(R.id.map);
+        me = new MyLocationOverlay(this, map);
+        map.getOverlays().add(me);
+
         mService = new Intent(this, GPSService.class);
     }
 
     @Override
-    protected boolean isRouteDisplayed() {
+    protected boolean isRouteDisplayed()
+    {
         return false;
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        me.disableCompass();
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        me.enableCompass();
     }
 
     @Override
