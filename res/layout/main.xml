@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-<TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="Hello World, SmartGPSLogger"
-    android:id="@+id/currentFreq"
-    />
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent">
+  <TextView android:id="@+id/text_area"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+            android:text="Hello world!"
+            android:layout_alignParentBottom="true" />
+  <com.google.android.maps.MapView android:id="@+id/map"
+				   android:layout_width="fill_parent"
+				   android:layout_height="wrap_content"
+				   android:apiKey="0a2TL5wCSguODqY0jNqfaokWnj5tr_3p61_Wt0Q"
+				   android:enabled="true"
+				   android:clickable="true"
+				   android:layout_above="@+id/text_area" />
+</RelativeLayout>
 

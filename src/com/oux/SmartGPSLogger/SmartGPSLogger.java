@@ -8,10 +8,10 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-
+import com.google.android.maps.MapActivity;
 import android.app.SearchManager;
 
-public class SmartGPSLogger extends Activity
+public class SmartGPSLogger extends MapActivity
 {
     private static final String TAG = "SmartGPSLogger";
 
@@ -24,9 +24,6 @@ public class SmartGPSLogger extends Activity
     private DataWriter writer;
     private Intent mService;
 
-    // UI
-    private TextView mCurrentFreq;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -34,9 +31,12 @@ public class SmartGPSLogger extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        mCurrentFreq = (TextView) findViewById(R.id.currentFreq);
-
         mService = new Intent(this, GPSService.class);
+    }
+
+    @Override
+    protected boolean isRouteDisplayed() {
+        return false;
     }
 
     @Override
