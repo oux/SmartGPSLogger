@@ -17,6 +17,9 @@
 
 package com.oux.SmartGPSLogger;
 
+import android.preference.PreferenceManager;
+import android.content.res.Resources;
+import android.content.SharedPreferences;
 import android.app.Service;
 import android.os.PowerManager;
 import android.location.LocationManager;
@@ -38,46 +41,56 @@ public class GPSService extends Service implements LocationListener
 {
     private static final String TAG = "GPSService";
     public static PowerManager.WakeLock wakelock;
-    private Object lock = new Object();
     private LocationManager mLm;
-    private LocationListener mLl;
-    private Location curLoc;
     private DataWriter writer;
     private Policy policy;
     private Timer timer;
     private TimerTask timeout;
+    private Resources mRes;
+    private SharedPreferences pref;
+    private Debug debug;
+    private boolean ready = false;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
+
+        try {
+            debug = new Debug();
+            writer = new DataWriter(debug);
+        } catch (java.io.IOException e) {
+            stopSelf();
+            ready = false;
+            Log.e(TAG, "Writers creation failed. Service start canceled : " +
+                  e.toString());
+        }
+
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                                   "SmartGPSLogger");
 
         mLm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        try {
-            writer = new DataWriter();
-        } catch (java.io.IOException e) {
-            Log.e(TAG, "Failed to open file: " + e.toString());
-        }
-
-        policy = new Policy(this);
+        policy = new Policy(this, debug);
         timer = new Timer("timeout", true);
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        mRes = this.getResources();
+
+        ready = true;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        if (!wakelock.isHeld())
+        if (ready && !wakelock.isHeld())
             getNewLocation();
         return Service.START_STICKY;
     }
 
     public void getNewLocation()
     {
-        Log.d(TAG, "ask for location update");
+        debug.log("ask for location update");
         if (!wakelock.isHeld()) {
             wakelock.acquire();
 
@@ -89,16 +102,19 @@ public class GPSService extends Service implements LocationListener
                     public void run () {
                         GPSService.this.timeout();
                     }};
-            timer.schedule(timeout, 60000);
+            int gpstimeout = Integer.valueOf
+                (pref.getString("gps_timeout",
+                                mRes.getString(R.string.GpsTimeout)));
+            timer.schedule(timeout, gpstimeout * 1000);
         }
     }
 
     private void timeout ()
     {
-        policy.setNextWakeUp(null);
+        debug.log("timeout fired");
         mLm.removeUpdates(GPSService.this);
+        int nextTime = policy.setNextWakeUp(null);
         wakelock.release();
-        Log.d(TAG, "timeout fired");
     }
 
     @Override
@@ -108,13 +124,13 @@ public class GPSService extends Service implements LocationListener
             timeout.cancel();
             timeout();
         }
-        Log.d(TAG, "destroyed");
+        debug.log("service destroyed");
     }
 
     @Override
     public void onLocationChanged(Location loc)
     {
-        Log.d(TAG, "new location found");
+        debug.log("new location found");
         timeout.cancel();
         try {
             writer.write(loc);
@@ -122,7 +138,9 @@ public class GPSService extends Service implements LocationListener
             Log.e(TAG, "Failed to write location data : " +
                   e.toString());
         }
-        policy.setNextWakeUp(loc);
+        mLm.removeUpdates(GPSService.this);
+        int nextTime = policy.setNextWakeUp(loc);
+        debug.log("will wake up in " + nextTime + " minutes");
         wakelock.release();
     }
 

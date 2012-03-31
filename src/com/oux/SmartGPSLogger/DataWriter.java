@@ -32,6 +32,7 @@ public class DataWriter
     private final String CURRENT = DIR + "current" + SUFFIX;
     private final String FMT = "yyyy-MM-dd";
 
+    private Debug debug;
     private String lastLocDate = null;
     private File file;
     private BufferedWriter writer;
@@ -42,16 +43,26 @@ public class DataWriter
         writer = new BufferedWriter(new FileWriter(file, true));
     }
 
-    public DataWriter () throws java.io.IOException
+    public DataWriter(Debug debug) throws java.io.IOException
     {
+        this.debug = debug;
+
         File root = Environment.getExternalStorageDirectory();
         if (root.canWrite())
         {
             File dir = new File(DIR);
-            if (!dir.exists())
-                dir.mkdir();
-            openCurrent();
+            if (!dir.exists() && !dir.mkdir())
+                throw new java.io.IOException("Failed to create " + DIR +
+                                              " directory");
+            else
+                openCurrent();
         }
+    }
+
+    protected void finalize() throws Throwable
+    {
+        writer.close();
+        super.finalize();
     }
 
     public void write(Location loc) throws java.io.IOException
@@ -69,21 +80,17 @@ public class DataWriter
             openCurrent();
         }
 
-        writer.write(DateFormat.format("yyyy:MM:dd", loc.getTime()) +
-                     "," + DateFormat.format("kk:mm:ss", loc.getTime()) +
-                     "," + loc.getLatitude() +
-                     "," + loc.getLongitude() +
-                     "," + loc.getSpeed() +
-                     "," + loc.getAltitude() + "\n");
+        String newLine = DateFormat.format("yyyy:MM:dd", loc.getTime()) +
+            "," + DateFormat.format("kk:mm:ss", loc.getTime()) +
+            "," + loc.getLatitude() +
+            "," + loc.getLongitude() +
+            "," + loc.getSpeed() +
+            "," + loc.getAltitude() + "\n";
+
+        writer.write(newLine);
         writer.flush();         // TODO: Flush on each line is fine
                                 // but use a BufferedWriter to flush
                                 // on each line is ugly
-    }
-
-    public void log(String message) throws java.io.IOException
-    {
-        writer.write(DateFormat.format("yyyy:MM:dd kk:mm:ss", System.currentTimeMillis())
-                     + "   " + message + "\n");
-        writer.flush();
+        debug.log(newLine);
     }
 }
