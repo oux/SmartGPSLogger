@@ -86,7 +86,8 @@ public class SmartGPSLogger extends MapActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
         super.onCreateOptionsMenu(menu);
 
         menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)

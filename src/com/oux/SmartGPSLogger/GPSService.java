@@ -151,16 +151,12 @@ public class GPSService extends Service implements LocationListener
     public void onStatusChanged(String provider, int status, Bundle extras) {}
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public IBinder onBind(Intent intent)
+    {
         return binder;
     }
 
     public class MyBinder extends Binder {
-        public GPSService getService()
-        {
-            return GPSService.this;
-        }
-
         public LinkedList<Location> getLocations()
         {
             return GPSService.this.data.getLocations();
