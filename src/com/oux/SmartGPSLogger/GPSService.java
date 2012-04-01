@@ -60,7 +60,7 @@ public class GPSService extends Service implements LocationListener
 
         try {
             debug = new Debug();
-            data = new GPSDataManager(debug);
+            data = new GPSDataManager(this, debug);
         } catch (java.io.IOException e) {
             stopSelf();
             ready = false;

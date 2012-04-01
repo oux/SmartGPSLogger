@@ -25,6 +25,14 @@ import java.io.BufferedWriter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import java.util.LinkedList;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+import android.content.Context;
+import android.content.res.Resources;
+import java.io.RandomAccessFile;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.text.ParseException;
 
 public class GPSDataManager
 {
@@ -38,6 +46,9 @@ public class GPSDataManager
     private File file;
     private BufferedWriter writer;
     private LinkedList<Location> locations;
+    private Context mContext;
+    private Resources mRes;
+    private SharedPreferences pref;
 
     private void openCurrent() throws java.io.IOException
     {
@@ -47,12 +58,31 @@ public class GPSDataManager
 
     private void loadLocations() throws java.io.IOException
     {
-        // TODO: implement it
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        File file = new File(CURRENT);
+        RandomAccessFile reader = new RandomAccessFile(file, "r");
+        String line;
+        if (file.length() > 80 * 100) {
+            reader.seek(file.length() - (80 * 100));
+            line = reader.readLine(); // Drop first probably uncomplete line
+        }
+        while ((line = reader.readLine()) != null)
+        {
+            String[] tokens = line.split(",");
+            Location loc = new Location("MyGPSProvider");
+            loc.setLatitude(new Float(tokens[2]).doubleValue());
+            loc.setLongitude(new Float(tokens[3]).doubleValue());
+            locations.add(loc);
+        }
+        reader.close();
     }
 
-    public GPSDataManager(Debug debug) throws java.io.IOException
+    public GPSDataManager(Context context, Debug debug) throws java.io.IOException
     {
         this.debug = debug;
+        mContext = context;
+        mRes = mContext.getResources();
+        pref = PreferenceManager.getDefaultSharedPreferences(mContext);
 
         locations = new LinkedList<Location>();
         File root = Environment.getExternalStorageDirectory();
@@ -88,6 +118,13 @@ public class GPSDataManager
 
     public void addNewLocation(Location loc)
     {
+        Location prev = getLastLocation();
+
+        boolean isClose = false;
+        if (prev.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist",
+                                                                 mRes.getString(R.string.MinDist))))
+            isClose = true;
+
         locations.add(loc);
         if (locations.size() > 100) // TODO: use a preference
             locations.removeFirst();
@@ -115,7 +152,8 @@ public class GPSDataManager
             "," + loc.getLatitude() +
             "," + loc.getLongitude() +
             "," + loc.getSpeed() +
-            "," + loc.getAltitude();
+            "," + loc.getAltitude() +
+            "," + isClose;
 
         try {
             writer.write(newLine  + "\n");
