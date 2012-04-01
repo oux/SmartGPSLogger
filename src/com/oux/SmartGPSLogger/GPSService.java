@@ -36,6 +36,7 @@ import android.os.IBinder;
 import android.os.Binder;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import java.util.LinkedList;
 
 public class GPSService extends Service implements LocationListener
 {
@@ -50,6 +51,7 @@ public class GPSService extends Service implements LocationListener
     private SharedPreferences pref;
     private Debug debug;
     private boolean ready = false;
+    private final IBinder binder = new MyBinder();
 
     @Override
     public void onCreate()
@@ -118,7 +120,7 @@ public class GPSService extends Service implements LocationListener
     }
 
     @Override
-	public void onDestroy()
+    public void onDestroy()
     {
         if (wakelock.isHeld()) {
             timeout.cancel();
@@ -149,7 +151,19 @@ public class GPSService extends Service implements LocationListener
     public void onStatusChanged(String provider, int status, Bundle extras) {}
 
     @Override
-	public IBinder onBind(Intent intent) {
-		return null;
-	}
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
+
+    public class MyBinder extends Binder {
+        public GPSService getService()
+        {
+            return GPSService.this;
+        }
+
+        public LinkedList<Location> getLocations()
+        {
+            return GPSService.this.data.getLocations();
+        }
+    }
 }
