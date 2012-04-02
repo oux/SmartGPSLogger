@@ -17,8 +17,6 @@
 
 package com.oux.SmartGPSLogger;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.content.Context;
 import android.content.res.Resources;
 import com.oux.SmartGPSLogger.R;
@@ -33,7 +31,6 @@ public class Policy
     private static final String TAG = "GPSPolicy";
     private Context mContext;
     private Resources mRes;
-    private SharedPreferences pref;
 
     private int currentFreq;
     private AlarmManager am;
@@ -43,11 +40,18 @@ public class Policy
     {
         this.debug = debug;
         mContext = context;
-        mRes = mContext.getResources();
-        pref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        currentFreq = Integer.valueOf(pref.getString("min_freq",
-                        mRes.getString(R.string.MinFreq)));
+        currentFreq = Settings.getInstance().minFreq();
         am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+    }
+
+    public int getCurrentFreq()
+    {
+        return currentFreq;
+    }
+
+    public void setCurrentFreqToMin()
+    {
+        currentFreq = Settings.getInstance().minFreq();
     }
 
     /* Set the next wake-up taking into account the current location
@@ -60,20 +64,13 @@ public class Policy
             /* Keep currentFreq unchanged */
         else if (cur == null) {
             debug.log("cur is null");
-            currentFreq = Math.min(currentFreq * 2,
-                                   Integer.valueOf(
-                                       pref.getString("max_freq", mRes.getString(R.string.MaxFreq))));
-        } else if (prev.distanceTo(cur) <= Float.valueOf(pref.getString("min_dist",
-                                                               mRes.getString(R.string.MinDist)))) {
+            currentFreq = Math.min(currentFreq * 2, Settings.getInstance().maxFreq());
+        } else if (prev.distanceTo(cur) <= Settings.getInstance().minDist()) {
             debug.log("prev and cur are very close");
-            currentFreq = Math.min(currentFreq * 2,
-                                   Integer.valueOf(
-                                       pref.getString("max_freq", mRes.getString(R.string.MaxFreq))));
+            currentFreq = Math.min(currentFreq * 2, Settings.getInstance().maxFreq());
         } else {
             debug.log("last case");
-            currentFreq = Math.max(currentFreq / 4,
-                                   Integer.valueOf(
-                                       pref.getString("min_freq", mRes.getString(R.string.MinFreq))));
+            setCurrentFreqToMin();
         }
         Intent intent = new Intent();
         intent.setAction(IntentReceiver.REQUEST_NEW_LOCATION);

@@ -20,8 +20,6 @@ package com.oux.SmartGPSLogger;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.os.PowerManager;
@@ -42,9 +40,8 @@ public class IntentReceiver extends BroadcastReceiver {
                                       "GPSIntentReceiver");
         }
         
-        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
         if (("android.intent.action.MEDIA_MOUNTED".equals(intent.getAction()) &&
-             pref.getBoolean("onboot",true)) ||
+             Settings.getInstance(context).onBoot()) ||
             REQUEST_NEW_LOCATION.equals(intent.getAction())) {
             Intent service = new Intent(context, GPSService.class);
             context.startService(new Intent(context, GPSService.class));

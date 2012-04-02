@@ -17,9 +17,7 @@
 
 package com.oux.SmartGPSLogger;
 
-import android.preference.PreferenceManager;
 import android.content.res.Resources;
-import android.content.SharedPreferences;
 import android.app.Service;
 import android.os.PowerManager;
 import android.location.LocationManager;
@@ -48,15 +46,16 @@ public class GPSService extends Service implements LocationListener
     private Timer timer;
     private TimerTask timeout;
     private Resources mRes;
-    private SharedPreferences pref;
     private Debug debug;
     private boolean ready = false;
     private final IBinder binder = new MyBinder();
+    private long lastGPSFixTime = 0;
 
     @Override
     public void onCreate()
     {
         super.onCreate();
+        Settings.getInstance(this);
 
         try {
             debug = new Debug();
@@ -76,8 +75,6 @@ public class GPSService extends Service implements LocationListener
 
         policy = new Policy(this, debug);
         timer = new Timer("timeout", true);
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        mRes = this.getResources();
 
         ready = true;
     }
@@ -104,10 +101,7 @@ public class GPSService extends Service implements LocationListener
                     public void run () {
                         GPSService.this.timeout();
                     }};
-            int gpstimeout = Integer.valueOf
-                (pref.getString("gps_timeout",
-                                mRes.getString(R.string.GpsTimeout)));
-            timer.schedule(timeout, gpstimeout * 1000);
+            timer.schedule(timeout, Settings.getInstance().gpsTimeout() * 1000);
         }
     }
 
@@ -134,6 +128,7 @@ public class GPSService extends Service implements LocationListener
     {
         debug.log("new location found");
         timeout.cancel();
+        lastGPSFixTime = System.currentTimeMillis();
         Location prev = data.getLastLocation();
         data.addNewLocation(loc);
         mLm.removeUpdates(GPSService.this);
@@ -160,6 +155,17 @@ public class GPSService extends Service implements LocationListener
         public LinkedList<Location> getLocations()
         {
             return GPSService.this.data.getLocations();
+        }
+
+        public void renew()
+        {
+            GPSService.this.policy.setCurrentFreqToMin();
+            GPSService.this.getNewLocation();
+        }
+
+        public long getLastGPSFixTime()
+        {
+            return GPSService.this.lastGPSFixTime;
         }
     }
 }

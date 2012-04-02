@@ -22,11 +22,11 @@ import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.Projection;
-import android.widget.Toast;
 import android.graphics.Point;
 import android.graphics.Path;
 import android.graphics.Paint;
 import android.graphics.Color;
+import android.text.format.DateFormat;
 
 public class SmartGPSLogger extends MapActivity
 {
@@ -42,17 +42,21 @@ public class SmartGPSLogger extends MapActivity
     private Intent mService;
     private MyLocationOverlay me;
     private MapView map;
+    private TextView text;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Settings.getInstance(this);
         setContentView(R.layout.main);
 
         map = (MapView)findViewById(R.id.map);
         me = new MyLocationOverlay(this, map);
         map.getOverlays().add(me);
+
+        text = (TextView)findViewById(R.id.text_area);
 
         mService = new Intent(this, GPSService.class);
         bindService(mService, connection, Context.BIND_AUTO_CREATE);
@@ -125,14 +129,22 @@ public class SmartGPSLogger extends MapActivity
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateText(long lastGPSFixTime)
+    {
+        text.setText("Last GPS fix at + " + DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
+        if (lastGPSFixTime >= System.currentTimeMillis() - 30 * 60 * 1000) // TODO: use pref
+            text.setTextColor(Color.GREEN);
+        else
+            text.setTextColor(Color.RED);
+    }
+
     private ServiceConnection connection = new ServiceConnection()
         {
             public void onServiceConnected(ComponentName className, IBinder binder)
             {
                 LinkedList<Location> locations = ((GPSService.MyBinder) binder).getLocations();
-                Toast.makeText(SmartGPSLogger.this, "Connected, locations list length : " + locations.size(),
-                               Toast.LENGTH_SHORT).show();
                 map.getOverlays().add(new PathOverlay(locations));
+                SmartGPSLogger.this.updateText(((GPSService.MyBinder) binder).getLastGPSFixTime());
             }
 
             public void onServiceDisconnected(ComponentName className) {}

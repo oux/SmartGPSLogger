@@ -25,8 +25,6 @@ import java.io.BufferedWriter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import java.util.LinkedList;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.content.Context;
 import android.content.res.Resources;
 import java.io.RandomAccessFile;
@@ -48,7 +46,6 @@ public class GPSDataManager
     private LinkedList<Location> locations;
     private Context mContext;
     private Resources mRes;
-    private SharedPreferences pref;
 
     private void openCurrent() throws java.io.IOException
     {
@@ -81,8 +78,6 @@ public class GPSDataManager
     {
         this.debug = debug;
         mContext = context;
-        mRes = mContext.getResources();
-        pref = PreferenceManager.getDefaultSharedPreferences(mContext);
 
         locations = new LinkedList<Location>();
         File root = Environment.getExternalStorageDirectory();
@@ -121,8 +116,7 @@ public class GPSDataManager
         Location prev = getLastLocation();
 
         boolean isClose = false;
-        if (prev.distanceTo(loc) <= Float.valueOf(pref.getString("min_dist",
-                                                                 mRes.getString(R.string.MinDist))))
+        if (prev.distanceTo(loc) <= Settings.getInstance().minDist())
             isClose = true;
 
         locations.add(loc);
