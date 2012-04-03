@@ -64,6 +64,7 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
         map = (MapView)findViewById(R.id.map);
         me = new MyLocationOverlay(this, map);
         map.getOverlays().add(me);
+        map.setBuiltInZoomControls(true);
 
         text = (TextView)findViewById(R.id.text_area);
 

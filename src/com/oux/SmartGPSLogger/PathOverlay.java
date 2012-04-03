@@ -64,10 +64,13 @@ public class PathOverlay extends Overlay implements LocationUpdate
 
     public void newLocation(Location loc)
     {
-        points.add(new GeoPoint((int)(loc.getLatitude() * 1E6),
-                                (int)(loc.getLongitude() * 1E6)));
-        if (mapView != null)
+        GeoPoint current = new GeoPoint((int)(loc.getLatitude() * 1E6),
+                                        (int)(loc.getLongitude() * 1E6));
+        points.add(current);
+        if (mapView != null) {
+            mapView.getController().setCenter(current);
             mapView.postInvalidate();
+        }
     }
 
     @Override
