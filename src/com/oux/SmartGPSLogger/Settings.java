@@ -71,7 +71,7 @@ public class Settings
     {
         if (instance != null)
             return instance;
-        return new Settings(context);
+        return instance = new Settings(context);
     }
 
     private static Settings instance = null;
