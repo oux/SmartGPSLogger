@@ -32,7 +32,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.text.ParseException;
 
-public class GPSDataManager
+public class GPSDataManager implements LocationUpdate
 {
     private final String DIR = "/sdcard/SmartGPSLogger/";
     private final String SUFFIX = ".log";
@@ -111,7 +111,7 @@ public class GPSDataManager
         return locations;
     }
 
-    public void addNewLocation(Location loc)
+    public void newLocation(Location loc)
     {
         Location prev = getLastLocation();
 

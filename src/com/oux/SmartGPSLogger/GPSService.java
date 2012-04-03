@@ -35,6 +35,7 @@ import android.os.Binder;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class GPSService extends Service implements LocationListener
 {
@@ -50,6 +51,7 @@ public class GPSService extends Service implements LocationListener
     private boolean ready = false;
     private final IBinder binder = new MyBinder();
     private long lastGPSFixTime = 0;
+    private LinkedList<LocationUpdate> updaters = new LinkedList<LocationUpdate>();
 
     @Override
     public void onCreate()
@@ -66,7 +68,7 @@ public class GPSService extends Service implements LocationListener
             Log.e(TAG, "Writers creation failed. Service start canceled : " +
                   e.toString());
         }
-
+        updaters.add(data);
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         wakelock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                                   "SmartGPSLogger");
@@ -117,6 +119,7 @@ public class GPSService extends Service implements LocationListener
     public void onDestroy()
     {
         if (wakelock.isHeld()) {
+            updaters.remove(data);
             timeout.cancel();
             timeout();
         }
@@ -130,10 +133,17 @@ public class GPSService extends Service implements LocationListener
         timeout.cancel();
         lastGPSFixTime = System.currentTimeMillis();
         Location prev = data.getLastLocation();
-        data.addNewLocation(loc);
+        notifyNewLocation(loc);
         mLm.removeUpdates(GPSService.this);
         policy.setNextWakeUp(prev, loc);
         wakelock.release();
+    }
+
+    private void notifyNewLocation(Location loc)
+    {
+        ListIterator<LocationUpdate> it = updaters.listIterator(0);
+        while (it.hasNext())
+            it.next().newLocation(loc);
     }
 
     @Override
@@ -166,6 +176,16 @@ public class GPSService extends Service implements LocationListener
         public long getLastGPSFixTime()
         {
             return GPSService.this.lastGPSFixTime;
+        }
+
+        public void registerLocationUpdate(LocationUpdate updater)
+        {
+            GPSService.this.updaters.add(updater);
+        }
+
+        public void unregisterLocationUpdate(LocationUpdate updater)
+        {
+            GPSService.this.updaters.remove(updater);
         }
     }
 }

@@ -11,24 +11,16 @@ import android.widget.TextView;
 import android.app.SearchManager;
 import android.content.ServiceConnection;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import android.content.ComponentName;
 import android.os.IBinder;
 import android.location.Location;
-import android.graphics.Canvas;
+import com.google.android.maps.MyLocationOverlay;
+import android.graphics.Color;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
-import com.google.android.maps.MyLocationOverlay;
-import com.google.android.maps.Overlay;
-import com.google.android.maps.GeoPoint;
-import com.google.android.maps.Projection;
-import android.graphics.Point;
-import android.graphics.Path;
-import android.graphics.Paint;
-import android.graphics.Color;
 import android.text.format.DateFormat;
 
-public class SmartGPSLogger extends MapActivity
+public class SmartGPSLogger extends MapActivity implements LocationUpdate
 {
     private static final String TAG = "SmartGPSLogger";
 
@@ -129,10 +121,19 @@ public class SmartGPSLogger extends MapActivity
         return super.onOptionsItemSelected(item);
     }
 
+    public void newLocation(Location loc)
+    {
+        updateText(System.currentTimeMillis());
+    }
+
     private void updateText(long lastGPSFixTime)
     {
-        text.setText("Last GPS fix at + " + DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
-        if (lastGPSFixTime >= System.currentTimeMillis() - 30 * 60 * 1000) // TODO: use pref
+        if (lastGPSFixTime == 0)
+            text.setText("Last GPS fix information is unavailable"); 
+        else
+            text.setText("Last GPS fix at + " + DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
+
+        if (lastGPSFixTime >= System.currentTimeMillis() - Settings.getInstance().maxFreq() * 60 * 1000)
             text.setTextColor(Color.GREEN);
         else
             text.setTextColor(Color.RED);
@@ -140,66 +141,26 @@ public class SmartGPSLogger extends MapActivity
 
     private ServiceConnection connection = new ServiceConnection()
         {
+            private GPSService.MyBinder binder;
+            private PathOverlay path;
+
             public void onServiceConnected(ComponentName className, IBinder binder)
             {
-                LinkedList<Location> locations = ((GPSService.MyBinder) binder).getLocations();
-                map.getOverlays().add(new PathOverlay(locations));
-                SmartGPSLogger.this.updateText(((GPSService.MyBinder) binder).getLastGPSFixTime());
+                this.binder = (GPSService.MyBinder)binder;
+                LinkedList<Location> locations = this.binder.getLocations();
+                path = new PathOverlay(locations);
+                map.getOverlays().add(path);
+                SmartGPSLogger.this.updateText(this.binder.getLastGPSFixTime());
+                this.binder.registerLocationUpdate(SmartGPSLogger.this);
+                this.binder.registerLocationUpdate(path);
             }
 
-            public void onServiceDisconnected(ComponentName className) {}
+            public void onServiceDisconnected(ComponentName className)
+            {
+                map.getOverlays().remove(path);
+                this.binder.unregisterLocationUpdate(SmartGPSLogger.this);
+                this.binder.unregisterLocationUpdate(path);
+            }
         };
-
-    private class PathOverlay extends Overlay
-    {
-        private LinkedList<GeoPoint> points = new LinkedList<GeoPoint>();
-
-        public PathOverlay(LinkedList<Location> locations)
-        {
-            ListIterator<Location> it = locations.listIterator(0);
-            while (it.hasNext()) {
-                Location cur = it.next();
-                points.add(new GeoPoint((int)(cur.getLatitude() * 1E6),
-                                        (int)(cur.getLongitude() * 1E6)));
-            }
-        }
-
-        @Override
-        public void draw(Canvas canvas, MapView mapView, boolean shadow)
-        {
-            super.draw(canvas, mapView, shadow);
-
-            if (points.size() < 2)
-                return;
-
-            Paint mPaint = new Paint();
-            mPaint.setDither(true);
-            mPaint.setColor(Color.RED);
-            mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-            mPaint.setStrokeJoin(Paint.Join.ROUND);
-            mPaint.setStrokeCap(Paint.Cap.ROUND);
-            mPaint.setStrokeWidth(2);
-
-            Path path = new Path();
-            Projection projection = mapView.getProjection();
-            GeoPoint gP1 = points.getFirst();
-            Point p1 = new Point();
-            Point p2 = new Point();
-            ListIterator<GeoPoint> it = points.listIterator(1);
-            while (it.hasNext()) {
-                GeoPoint gP2 = it.next();
-
-                projection.toPixels(gP1, p1);
-                projection.toPixels(gP2, p2);
-
-                path.moveTo(p2.x, p2.y);
-                path.lineTo(p1.x, p1.y);
-
-                gP1 = gP2;
-            }
-
-            canvas.drawPath(path, mPaint);
-        }
-    }
 }
 // vi:et
