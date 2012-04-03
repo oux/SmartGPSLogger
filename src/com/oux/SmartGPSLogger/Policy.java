@@ -24,9 +24,11 @@ import android.location.Location;
 import android.app.AlarmManager;
 import android.content.Intent;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
 
 /* This class implements the smart wake-up policy.  */
-public class Policy
+public class Policy extends BroadcastReceiver
 {
     private static final String TAG = "GPSPolicy";
     private Context mContext;
@@ -35,6 +37,9 @@ public class Policy
     private int currentFreq;
     private AlarmManager am;
     private Debug debug;
+    private long nextWakeUpTime = 0;
+
+    private double coef = 1.0;
 
     public Policy (Context context, Debug debug)
     {
@@ -42,6 +47,12 @@ public class Policy
         mContext = context;
         currentFreq = Settings.getInstance().minFreq();
         am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+        context.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    }
+
+    public long getNextWakeUpTime()
+    {
+        return nextWakeUpTime;
     }
 
     public int getCurrentFreq()
@@ -51,7 +62,31 @@ public class Policy
 
     public void setCurrentFreqToMin()
     {
-        currentFreq = Settings.getInstance().minFreq();
+        currentFreq = (int)((double)Settings.getInstance().minFreq() * coef);
+    }
+
+    private int maxFreq()
+    {
+        return (int)((double)Settings.getInstance().maxFreq() * coef);
+    }
+
+    @Override
+    public void onReceive(Context arg0, Intent intent)
+    {
+        int level = intent.getIntExtra("level", 0);
+        if (level > 25) {
+            if (coef != 1.0)
+                debug.log("battery normal state, set coef to 1.0");
+            coef = 1.0;
+        } else if (level > 15 && coef != 2.0) {
+            if (coef != 2.0)
+                debug.log("battery warning state, set coef to 2.0");
+            coef = 2.0;
+        } else if (coef != 4.0) {
+            if (coef != 1.5)
+                debug.log("battery critical state, set coef to 4.0");
+            coef = 4.0;
+        }
     }
 
     /* Set the next wake-up taking into account the current location
@@ -64,10 +99,10 @@ public class Policy
             /* Keep currentFreq unchanged */
         else if (cur == null) {
             debug.log("cur is null");
-            currentFreq = Math.min(currentFreq * 2, Settings.getInstance().maxFreq());
+            currentFreq = Math.min(currentFreq * 2, maxFreq());
         } else if (prev.distanceTo(cur) <= Settings.getInstance().minDist()) {
             debug.log("prev and cur are very close");
-            currentFreq = Math.min(currentFreq * 2, Settings.getInstance().maxFreq());
+            currentFreq = Math.min(currentFreq * 2, maxFreq());
         } else {
             debug.log("last case");
             setCurrentFreqToMin();
@@ -77,8 +112,9 @@ public class Policy
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0,
                                                                  intent,
                                                                  PendingIntent.FLAG_ONE_SHOT);
-        am.set(AlarmManager.RTC_WAKEUP,
-               System.currentTimeMillis() + (currentFreq * 60 * 1000), pendingIntent);
+
+        nextWakeUpTime = System.currentTimeMillis() + (currentFreq * 60 * 1000);
+        am.set(AlarmManager.RTC_WAKEUP, nextWakeUpTime, pendingIntent);
         debug.log("will wake-up in " + currentFreq + " minutes");
 
         return currentFreq;
