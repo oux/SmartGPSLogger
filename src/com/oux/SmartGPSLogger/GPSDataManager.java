@@ -133,7 +133,7 @@ public class GPSDataManager implements LocationUpdate
             try {
                 debug.log("Process file rotation");
                 writer.close();
-                file.renameTo(new File(DIR + lastLocDate + ".txt"));
+                file.renameTo(new File(DIR + lastLocDate + SUFFIX));
                 lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
                 openCurrent();
             } catch (java.io.IOException e) {
