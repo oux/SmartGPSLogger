@@ -34,6 +34,10 @@ public class PathOverlay extends Overlay implements LocationUpdate
 {
     private LinkedList<GeoPoint> points = new LinkedList<GeoPoint>();
 
+    private MapView mapView;
+    private Paint pathPaint;
+    private Paint pointPaint;
+
     public PathOverlay(LinkedList<Location> locations)
     {
         ListIterator<Location> it = locations.listIterator(0);
@@ -42,29 +46,38 @@ public class PathOverlay extends Overlay implements LocationUpdate
             points.add(new GeoPoint((int)(cur.getLatitude() * 1E6),
                                     (int)(cur.getLongitude() * 1E6)));
         }
+
+        pathPaint = new Paint();
+        pathPaint.setDither(true);
+        pathPaint.setColor(Color.RED);
+        pathPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        pathPaint.setStrokeJoin(Paint.Join.ROUND);
+        pathPaint.setStrokeCap(Paint.Cap.ROUND);
+        pathPaint.setStrokeWidth(2);
+
+        pointPaint = new Paint();
+        pointPaint.setColor(Color.BLUE);
+        pointPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        pointPaint.setStrokeWidth(10);
+        pointPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     public void newLocation(Location loc)
     {
         points.add(new GeoPoint((int)(loc.getLatitude() * 1E6),
                                 (int)(loc.getLongitude() * 1E6)));
+        if (mapView != null)
+            mapView.postInvalidate();
     }
 
     @Override
     public void draw(Canvas canvas, MapView mapView, boolean shadow)
     {
         super.draw(canvas, mapView, shadow);
+        this.mapView = mapView;
 
         if (points.size() < 2)
             return;
-
-        Paint mPaint = new Paint();
-        mPaint.setDither(true);
-        mPaint.setColor(Color.RED);
-        mPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(2);
 
         Path path = new Path();
         Projection projection = mapView.getProjection();
@@ -84,6 +97,7 @@ public class PathOverlay extends Overlay implements LocationUpdate
             gP1 = gP2;
         }
 
-        canvas.drawPath(path, mPaint);
+        canvas.drawPath(path, pathPaint);
+        canvas.drawPoint(p2.x, p2.y, pointPaint);
     }
 }
