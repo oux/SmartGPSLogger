@@ -73,19 +73,23 @@ public class Policy extends BroadcastReceiver
     @Override
     public void onReceive(Context arg0, Intent intent)
     {
-        int level = intent.getIntExtra("level", 0);
-        if (level > 25) {
+        int level = intent.getIntExtra("level", 100);
+        if (level >= 25) {
             if (coef != 1.0)
                 debug.log("battery normal state, set coef to 1.0");
             coef = 1.0;
-        } else if (level > 15 && coef != 2.0) {
+        } else if (level >= 15) {
             if (coef != 2.0)
                 debug.log("battery warning state, set coef to 2.0");
             coef = 2.0;
-        } else if (coef != 4.0) {
-            if (coef != 1.5)
-                debug.log("battery critical state, set coef to 4.0");
+        } else if (level >= 8) {
+            if (coef != 4.0)
+                debug.log("battery low state, set coef to 4.0");
             coef = 4.0;
+        } else {
+            if (coef != 8.0)
+                debug.log("battery critical state, set coef to 8.0");
+            coef = 8.0;
         }
     }
 
