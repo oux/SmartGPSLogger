@@ -56,24 +56,24 @@ public class Preferences extends PreferenceActivity {
         Resources res = getResources();
         EditTextPreference etp = (EditTextPreference) findPreference("min_freq");
         etp.setSummary("Default: " + res.getString(R.string.MinFreq) +
-                       ", current: " + pref.getString("min_freq",
-                           res.getString(R.string.MinFreq)));
+                       " minutes, current: " + pref.getString("min_freq",
+                           res.getString(R.string.MinFreq)) + " minutes");
         etp = (EditTextPreference) findPreference("max_freq");
         etp.setSummary("Default: " + res.getString(R.string.MaxFreq) +
-                       ", current: " + pref.getString("max_freq",
-                           res.getString(R.string.MaxFreq)));
+                       " minutes, current: " + pref.getString("max_freq",
+                           res.getString(R.string.MaxFreq)) + " minutes");
         etp = (EditTextPreference) findPreference("min_dist");
         etp.setSummary("Default: " + res.getString(R.string.MinDist) +
-                       ", current: " + pref.getString("min_dist",
-                           res.getString(R.string.MinDist)));
+                       " meters, current: " + pref.getString("min_dist",
+                           res.getString(R.string.MinDist)) + " meters");
         etp = (EditTextPreference) findPreference("gps_timeout");
         etp.setSummary("Default: " + res.getString(R.string.GpsTimeout) +
-                       ", current: " + pref.getString("gps_timeout",
-                           res.getString(R.string.GpsTimeout)));
+                       " seconds, current: " + pref.getString("gps_timeout",
+                           res.getString(R.string.GpsTimeout)) + " seconds");
         etp = (EditTextPreference) findPreference("max_loc");
         etp.setSummary("Default: " + res.getString(R.string.LocCacheSize) +
-                       ", current: " + pref.getString("max_loc",
-                           res.getString(R.string.LocCacheSize)));
+                       " locations, current: " + pref.getString("max_loc",
+                           res.getString(R.string.LocCacheSize)) + " locations");
     }
 
 }
