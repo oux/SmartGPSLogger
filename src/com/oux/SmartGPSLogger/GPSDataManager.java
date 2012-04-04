@@ -59,8 +59,8 @@ public class GPSDataManager implements LocationUpdate
         File file = new File(CURRENT);
         RandomAccessFile reader = new RandomAccessFile(file, "r");
         String line;
-        if (file.length() > 80 * 100) {
-            reader.seek(file.length() - (80 * 100));
+        if (file.length() > 80 * Settings.getInstance().locCacheSize()) {
+            reader.seek(file.length() - (80 * Settings.getInstance().locCacheSize()));
             line = reader.readLine(); // Drop first probably uncomplete line
         }
         while ((line = reader.readLine()) != null)
