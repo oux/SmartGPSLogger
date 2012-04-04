@@ -44,13 +44,13 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     // Identifiers for option menu items
     private static final int MENU_RECLOG = Menu.FIRST;
     private static final int MENU_STOPLOG = MENU_RECLOG + 1;
-    private static final int MENU_PLAYLOG = MENU_STOPLOG + 1;
-    private static final int MENU_SETTINGS = MENU_PLAYLOG + 1;
+    private static final int MENU_SETTINGS = MENU_STOPLOG + 1;
 
     private Intent mService;
     private MyLocationOverlay me;
     private MapView map;
     private TextView text;
+    private GPSService.MyBinder binder;
 
     /** Called when the activity is first created. */
     @Override
@@ -99,19 +99,17 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
+    public boolean onPrepareOptionsMenu(Menu menu)
     {
-        super.onCreateOptionsMenu(menu);
-
-        menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
-            .setIcon(R.drawable.ic_reclog)
-            .setAlphabeticShortcut(SearchManager.MENU_KEY);
-        menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
-            .setIcon(R.drawable.ic_stoplog)
-            .setAlphabeticShortcut(SearchManager.MENU_KEY);
-        menu.add(0, MENU_PLAYLOG, 0, R.string.menu_playlog)
-            .setIcon(R.drawable.ic_playlog)
-            .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        menu.clear();
+        if (!binder.isRunning())
+            menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
+                .setIcon(R.drawable.ic_reclog)
+                .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        else
+            menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
+                .setIcon(R.drawable.ic_stoplog)
+                .setAlphabeticShortcut(SearchManager.MENU_KEY);
         menu.add(0, MENU_SETTINGS, 0, R.string.menu_settings)
             .setIcon(android.R.drawable.ic_menu_preferences)
             .setIntent(new Intent(this,Preferences.class))
@@ -124,14 +122,10 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
         switch (item.getItemId()) {
         case MENU_RECLOG:
             this.startService(mService);
-            Log.d(TAG, "started");
             return true;
         case MENU_STOPLOG:
-            this.stopService(mService);
+            this.binder.stopUpdates();
             Log.d(TAG, "stopped");
-            return true;
-        case MENU_PLAYLOG:
-            // START MAP ACTIVITY
             return true;
         }
 
@@ -146,7 +140,7 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     private void updateText(long lastGPSFixTime)
     {
         if (lastGPSFixTime == 0)
-            text.setText("Last GPS fix information is unavailable"); 
+            text.setText("Last GPS fix information is not available");
         else
             text.setText("Last GPS fix at + " + DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
 
@@ -157,27 +151,26 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     }
 
     private ServiceConnection connection = new ServiceConnection()
+    {
+        private PathOverlay path;
+
+        public void onServiceConnected(ComponentName className, IBinder binder)
         {
-            private GPSService.MyBinder binder;
-            private PathOverlay path;
+            SmartGPSLogger.this.binder = (GPSService.MyBinder)binder;
+            LinkedList<Location> locations = SmartGPSLogger.this.binder.getLocations();
+            path = new PathOverlay(locations);
+            map.getOverlays().add(path);
+            SmartGPSLogger.this.updateText(SmartGPSLogger.this.binder.getLastGPSFixTime());
+            SmartGPSLogger.this.binder.registerLocationUpdate(SmartGPSLogger.this);
+            SmartGPSLogger.this.binder.registerLocationUpdate(path);
+        }
 
-            public void onServiceConnected(ComponentName className, IBinder binder)
-            {
-                this.binder = (GPSService.MyBinder)binder;
-                LinkedList<Location> locations = this.binder.getLocations();
-                path = new PathOverlay(locations);
-                map.getOverlays().add(path);
-                SmartGPSLogger.this.updateText(this.binder.getLastGPSFixTime());
-                this.binder.registerLocationUpdate(SmartGPSLogger.this);
-                this.binder.registerLocationUpdate(path);
-            }
-
-            public void onServiceDisconnected(ComponentName className)
-            {
-                map.getOverlays().remove(path);
-                this.binder.unregisterLocationUpdate(SmartGPSLogger.this);
-                this.binder.unregisterLocationUpdate(path);
-            }
-        };
+        public void onServiceDisconnected(ComponentName className)
+        {
+            map.getOverlays().remove(path);
+            SmartGPSLogger.this.binder.unregisterLocationUpdate(SmartGPSLogger.this);
+            SmartGPSLogger.this.binder.unregisterLocationUpdate(path);
+        }
+    };
 }
 // vi:et

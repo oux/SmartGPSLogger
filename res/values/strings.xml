@@ -11,7 +11,6 @@
     <!-- Preferences -->
     <string name="menu_reclog">Start recording</string>
     <string name="menu_stoplog">Stop recording</string>
-    <string name="menu_playlog">See last records on map</string>
     <string name="menu_settings">Settings</string>
 
     <!-- Preferences -->

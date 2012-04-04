@@ -52,6 +52,7 @@ public class GPSService extends Service implements LocationListener
     private final IBinder binder = new MyBinder();
     private long lastGPSFixTime = 0;
     private LinkedList<LocationUpdate> updaters = new LinkedList<LocationUpdate>();
+    private boolean isRunning = false;
 
     @Override
     public void onCreate()
@@ -84,8 +85,10 @@ public class GPSService extends Service implements LocationListener
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        if (ready && !wakelock.isHeld())
+        if (ready && !wakelock.isHeld()) {
+            isRunning = true;
             getNewLocation();
+        }
         return Service.START_STICKY;
     }
 
@@ -111,7 +114,8 @@ public class GPSService extends Service implements LocationListener
     {
         debug.log("timeout fired");
         mLm.removeUpdates(GPSService.this);
-        policy.setNextWakeUp(data.getLastLocation(), null);
+        if (isRunning)
+            policy.setNextWakeUp(data.getLastLocation(), null);
         wakelock.release();
     }
 
@@ -135,7 +139,8 @@ public class GPSService extends Service implements LocationListener
         Location prev = data.getLastLocation();
         notifyNewLocation(loc);
         mLm.removeUpdates(GPSService.this);
-        policy.setNextWakeUp(prev, loc);
+        if (isRunning)
+            policy.setNextWakeUp(prev, loc);
         wakelock.release();
     }
 
@@ -186,6 +191,18 @@ public class GPSService extends Service implements LocationListener
         public void unregisterLocationUpdate(LocationUpdate updater)
         {
             GPSService.this.updaters.remove(updater);
+        }
+
+        public boolean isRunning()
+        {
+            return GPSService.this.isRunning;
+        }
+
+        public void stopUpdates()
+        {
+            GPSService.this.isRunning = false;
+            GPSService.this.policy.reset();
+            GPSService.this.debug.log("stop location auto update");
         }
     }
 }
