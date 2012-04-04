@@ -120,7 +120,7 @@ public class GPSDataManager implements LocationUpdate
             isClose = true;
 
         locations.add(loc);
-        if (locations.size() > 100) // TODO: use a preference
+        if (locations.size() > Settings.getInstance().locCacheSize())
             locations.removeFirst();
 
         String newLocDate = DateFormat.format(FMT, loc.getTime()).toString();

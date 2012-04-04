@@ -70,6 +70,10 @@ public class Preferences extends PreferenceActivity {
         etp.setSummary("Default: " + res.getString(R.string.GpsTimeout) +
                        ", current: " + pref.getString("gps_timeout",
                            res.getString(R.string.GpsTimeout)));
+        etp = (EditTextPreference) findPreference("max_loc");
+        etp.setSummary("Default: " + res.getString(R.string.LocCacheSize) +
+                       ", current: " + pref.getString("max_loc",
+                           res.getString(R.string.LocCacheSize)));
     }
 
 }

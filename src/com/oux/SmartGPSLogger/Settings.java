@@ -51,6 +51,12 @@ public class Settings
                                               res.getString(R.string.GpsTimeout)));
     }
 
+    public int locCacheSize()
+    {
+        return Integer.valueOf(pref.getString("max_loc",
+                                              res.getString(R.string.LocCacheSize)));
+    }
+
     public boolean onBoot()
     {
         return pref.getBoolean("onboot", true);

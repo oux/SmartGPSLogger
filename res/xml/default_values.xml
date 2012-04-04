@@ -47,6 +47,13 @@
             android:numeric="integer"
             android:dialogTitle="@string/dialog_title_gpstimeout_preference" />
 
+    <EditTextPreference
+            android:key="max_loc"
+            android:defaultValue="@string/LocCacheSize"
+            android:title="@string/title_locmax_preference"
+            android:numeric="integer"
+            android:dialogTitle="@string/dialog_title_locmax_preference" />
+
     <CheckBoxPreference
             android:key="onboot"
             android:defaultValue="true"

@@ -6,6 +6,7 @@
     <string name="MaxFreq">30</string>
     <string name="MinDist">100</string>
     <string name="GpsTimeout">120</string>
+    <string name="LocCacheSize">100</string>
 
     <!-- Preferences -->
     <string name="menu_reclog">Start recording</string>
@@ -26,6 +27,9 @@
     <string name="title_gpstimeout_preference">GPS fix timeout</string>
     <string name="summary_gpstimeout_preference">Default: 120</string>
     <string name="dialog_title_gpstimeout_preference">GPS fix timeout</string>
+
+    <string name="title_locmax_preference">Location cache length</string>
+    <string name="dialog_title_locmax_preference">Location cache length</string>
 
     <string name="title_onboot_preference">Activate logger on boot</string>
     <string name="summary_onboot_preference">Activate logger on boot</string>
