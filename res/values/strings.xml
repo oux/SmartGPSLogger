@@ -4,7 +4,7 @@
 
     <string name="MinFreq">3</string>
     <string name="MaxFreq">30</string>
-    <string name="MinDist">500</string>
+    <string name="MinDist">100</string>
     <string name="GpsTimeout">120</string>
 
     <!-- Preferences -->
