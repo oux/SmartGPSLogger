@@ -115,9 +115,9 @@ public class GPSDataManager implements LocationUpdate
     {
         Location prev = getLastLocation();
 
-        boolean isClose = false;
+        boolean tooClose = false;
         if (prev.distanceTo(loc) <= Settings.getInstance().minDist())
-            isClose = true;
+            tooClose = true;
 
         locations.add(loc);
         if (locations.size() > Settings.getInstance().locCacheSize())
@@ -147,7 +147,7 @@ public class GPSDataManager implements LocationUpdate
             "," + loc.getLongitude() +
             "," + loc.getSpeed() +
             "," + loc.getAltitude() +
-            "," + isClose;
+            "," + tooClose;
 
         try {
             writer.write(newLine  + "\n");
