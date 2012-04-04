@@ -50,16 +50,19 @@ public class PathOverlay extends Overlay implements LocationUpdate
         pathPaint = new Paint();
         pathPaint.setDither(true);
         pathPaint.setColor(Color.RED);
-        pathPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        pathPaint.setStyle(Paint.Style.STROKE);
         pathPaint.setStrokeJoin(Paint.Join.ROUND);
         pathPaint.setStrokeCap(Paint.Cap.ROUND);
         pathPaint.setStrokeWidth(2);
+        pathPaint.setAntiAlias(true);
+        pathPaint.setAlpha(50);
 
         pointPaint = new Paint();
         pointPaint.setColor(Color.BLUE);
         pointPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         pointPaint.setStrokeWidth(10);
         pointPaint.setStrokeCap(Paint.Cap.ROUND);
+        pointPaint.setAntiAlias(true);
     }
 
     public void newLocation(Location loc)
@@ -68,7 +71,7 @@ public class PathOverlay extends Overlay implements LocationUpdate
                                         (int)(loc.getLongitude() * 1E6));
         points.add(current);
         if (mapView != null) {
-            mapView.getController().setCenter(current);
+            mapView.getController().animateTo(current);
             mapView.postInvalidate();
         }
     }
