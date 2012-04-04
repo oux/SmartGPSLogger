@@ -44,7 +44,8 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     // Identifiers for option menu items
     private static final int MENU_RECLOG = Menu.FIRST;
     private static final int MENU_STOPLOG = MENU_RECLOG + 1;
-    private static final int MENU_SETTINGS = MENU_STOPLOG + 1;
+    private static final int MENU_FORCE = MENU_STOPLOG + 1;
+    private static final int MENU_SETTINGS = MENU_FORCE + 1;
 
     private Intent mService;
     private MyLocationOverlay me;
@@ -106,10 +107,14 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
             menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
                 .setIcon(R.drawable.ic_reclog)
                 .setAlphabeticShortcut(SearchManager.MENU_KEY);
-        else
+        else {
             menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
                 .setIcon(R.drawable.ic_stoplog)
                 .setAlphabeticShortcut(SearchManager.MENU_KEY);
+            menu.add(0, MENU_FORCE, 0, R.string.menu_force)
+                .setIcon(R.drawable.ic_reclog)
+                .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        }
         menu.add(0, MENU_SETTINGS, 0, R.string.menu_settings)
             .setIcon(android.R.drawable.ic_menu_preferences)
             .setIntent(new Intent(this,Preferences.class))
@@ -121,6 +126,7 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case MENU_RECLOG:
+        case MENU_FORCE:
             this.startService(mService);
             return true;
         case MENU_STOPLOG:
