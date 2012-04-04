@@ -47,7 +47,6 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     private static final int MENU_PLAYLOG = MENU_STOPLOG + 1;
     private static final int MENU_SETTINGS = MENU_PLAYLOG + 1;
 
-    private DataWriter writer;
     private Intent mService;
     private MyLocationOverlay me;
     private MapView map;
