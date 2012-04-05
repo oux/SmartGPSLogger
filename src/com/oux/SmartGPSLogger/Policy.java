@@ -49,11 +49,6 @@ public class Policy extends BroadcastReceiver
         currentFreq = Settings.getInstance().minFreq();
         am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         context.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        Intent intent = new Intent();
-        intent.setAction(IntentReceiver.REQUEST_NEW_LOCATION);
-        pendingIntent = PendingIntent.getBroadcast(mContext, 0,
-                                                   intent,
-                                                   PendingIntent.FLAG_ONE_SHOT);
     }
 
     public long getNextWakeUpTime()
@@ -125,6 +120,11 @@ public class Policy extends BroadcastReceiver
         }
 
         nextWakeUpTime = System.currentTimeMillis() + (currentFreq * 60 * 1000);
+        Intent intent = new Intent();
+        intent.setAction(IntentReceiver.REQUEST_NEW_LOCATION);
+        pendingIntent = PendingIntent.getBroadcast(mContext, 0,
+                                                   intent,
+                                                   PendingIntent.FLAG_ONE_SHOT);
         am.set(AlarmManager.RTC_WAKEUP, nextWakeUpTime, pendingIntent);
         debug.log("will wake-up in " + currentFreq + " minutes");
 
