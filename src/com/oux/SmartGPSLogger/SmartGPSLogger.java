@@ -103,17 +103,19 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
     public boolean onPrepareOptionsMenu(Menu menu)
     {
         menu.clear();
-        if (!binder.isRunning())
-            menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
-                .setIcon(R.drawable.ic_reclog)
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
-        else {
-            menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
-                .setIcon(R.drawable.ic_stoplog)
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
-            menu.add(0, MENU_FORCE, 0, R.string.menu_force)
-                .setIcon(R.drawable.ic_reclog)
-                .setAlphabeticShortcut(SearchManager.MENU_KEY);
+        if (binder != null) {
+            if (!binder.isRunning())
+                menu.add(0, MENU_RECLOG, 0, R.string.menu_reclog)
+                    .setIcon(R.drawable.ic_reclog)
+                    .setAlphabeticShortcut(SearchManager.MENU_KEY);
+            else {
+                menu.add(0, MENU_STOPLOG, 0, R.string.menu_stoplog)
+                    .setIcon(R.drawable.ic_stoplog)
+                    .setAlphabeticShortcut(SearchManager.MENU_KEY);
+                menu.add(0, MENU_FORCE, 0, R.string.menu_force)
+                    .setIcon(R.drawable.ic_reclog)
+                    .setAlphabeticShortcut(SearchManager.MENU_KEY);
+            }
         }
         menu.add(0, MENU_SETTINGS, 0, R.string.menu_settings)
             .setIcon(android.R.drawable.ic_menu_preferences)
