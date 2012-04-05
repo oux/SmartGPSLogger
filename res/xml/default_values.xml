@@ -20,18 +20,18 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-            android:key="min_freq"
-            android:defaultValue="@string/MinFreq"
-            android:title="@string/title_minfreq_preference"
+            android:key="min_period"
+            android:defaultValue="@string/MinPeriod"
+            android:title="@string/title_minperiod_preference"
             android:numeric="integer"
-            android:dialogTitle="@string/dialog_title_minfreq_preference" />
+            android:dialogTitle="@string/dialog_title_minperiod_preference" />
 
     <EditTextPreference
-            android:key="max_freq"
-            android:defaultValue="@string/MaxFreq"
-            android:title="@string/title_maxfreq_preference"
+            android:key="max_period"
+            android:defaultValue="@string/MaxPeriod"
+            android:title="@string/title_maxperiod_preference"
             android:numeric="integer"
-            android:dialogTitle="@string/dialog_title_maxfreq_preference" />
+            android:dialogTitle="@string/dialog_title_maxperiod_preference" />
 
     <EditTextPreference
             android:key="min_dist"

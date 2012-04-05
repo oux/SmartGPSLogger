@@ -54,14 +54,14 @@ public class Preferences extends PreferenceActivity {
         SharedPreferences pref;
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         Resources res = getResources();
-        EditTextPreference etp = (EditTextPreference) findPreference("min_freq");
-        etp.setSummary("Default: " + res.getString(R.string.MinFreq) +
-                       " minutes, current: " + pref.getString("min_freq",
-                           res.getString(R.string.MinFreq)) + " minutes");
-        etp = (EditTextPreference) findPreference("max_freq");
-        etp.setSummary("Default: " + res.getString(R.string.MaxFreq) +
-                       " minutes, current: " + pref.getString("max_freq",
-                           res.getString(R.string.MaxFreq)) + " minutes");
+        EditTextPreference etp = (EditTextPreference) findPreference("min_period");
+        etp.setSummary("Default: " + res.getString(R.string.MinPeriod) +
+                       " minutes, current: " + pref.getString("min_period",
+                           res.getString(R.string.MinPeriod)) + " minutes");
+        etp = (EditTextPreference) findPreference("max_period");
+        etp.setSummary("Default: " + res.getString(R.string.MaxPeriod) +
+                       " minutes, current: " + pref.getString("max_period",
+                           res.getString(R.string.MaxPeriod)) + " minutes");
         etp = (EditTextPreference) findPreference("min_dist");
         etp.setSummary("Default: " + res.getString(R.string.MinDist) +
                        " meters, current: " + pref.getString("min_dist",

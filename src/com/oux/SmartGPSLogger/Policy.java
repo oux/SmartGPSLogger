@@ -34,7 +34,7 @@ public class Policy extends BroadcastReceiver
     private Context mContext;
     private Resources mRes;
 
-    private int currentFreq;
+    private int currentPeriod;
     private AlarmManager am;
     private Debug debug;
     private long nextWakeUpTime = 0;
@@ -46,7 +46,7 @@ public class Policy extends BroadcastReceiver
     {
         this.debug = debug;
         mContext = context;
-        currentFreq = Settings.getInstance().minFreq();
+        currentPeriod = Settings.getInstance().minPeriod();
         am = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         context.registerReceiver(this, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
@@ -56,26 +56,28 @@ public class Policy extends BroadcastReceiver
         return nextWakeUpTime;
     }
 
-    public int getCurrentFreq()
+    public int getCurrentPeriod()
     {
-        return currentFreq;
+        return currentPeriod;
     }
 
-    public void setCurrentFreqToMin()
+    public void setCurrentPeriodToMin()
     {
-        currentFreq = (int)((double)Settings.getInstance().minFreq() * coef);
+        currentPeriod = (int)((double)Settings.getInstance().minPeriod() * coef);
     }
 
-    private int maxFreq()
+    private int maxPeriod()
     {
-        return (int)((double)Settings.getInstance().maxFreq() * coef);
+        return (int)((double)Settings.getInstance().maxPeriod() * coef);
     }
 
     public void reset()
     {
-        currentFreq = Settings.getInstance().minFreq();
+        currentPeriod = Settings.getInstance().minPeriod();
         am.cancel(pendingIntent);
     }
+
+    private int prevBatLevel = 0;
 
     @Override
     public void onReceive(Context arg0, Intent intent)
@@ -98,37 +100,40 @@ public class Policy extends BroadcastReceiver
                 debug.log("battery critical state, set coef to 8.0");
             coef = 8.0;
         }
+
+        if (prevBatLevel != level)
+            debug.log("battery level = " + level);
     }
 
     /* Set the next wake-up taking into account the current location
      * LOC (could be null), the previous position and the current
-     * frequency.  */
+     * period.  */
     public int setNextWakeUp (Location prev, Location cur)
     {
         if (prev == null && cur != null)
             debug.log("prev is null and cur is NOT null");
-            /* Keep currentFreq unchanged */
+            /* Keep currentPeriod unchanged */
         else if (cur == null) {
             debug.log("cur is null");
-            currentFreq = Math.min(currentFreq * 2, maxFreq());
+            currentPeriod = Math.min(currentPeriod * 2, maxPeriod());
         } else if (prev.distanceTo(cur) <= Settings.getInstance().minDist()) {
             debug.log("prev and cur are very close");
-            currentFreq = Math.min(currentFreq * 2, maxFreq());
+            currentPeriod = Math.min(currentPeriod * 2, maxPeriod());
         } else {
             debug.log("last case");
-            setCurrentFreqToMin();
+            setCurrentPeriodToMin();
         }
 
-        nextWakeUpTime = System.currentTimeMillis() + (currentFreq * 60 * 1000);
+        nextWakeUpTime = System.currentTimeMillis() + (currentPeriod * 60 * 1000);
         Intent intent = new Intent();
         intent.setAction(IntentReceiver.REQUEST_NEW_LOCATION);
         pendingIntent = PendingIntent.getBroadcast(mContext, 0,
                                                    intent,
                                                    PendingIntent.FLAG_ONE_SHOT);
         am.set(AlarmManager.RTC_WAKEUP, nextWakeUpTime, pendingIntent);
-        debug.log("will wake-up in " + currentFreq + " minutes");
+        debug.log("will wake-up in " + currentPeriod + " minutes");
 
-        return currentFreq;
+        return currentPeriod;
     }
 }
 // vi:et

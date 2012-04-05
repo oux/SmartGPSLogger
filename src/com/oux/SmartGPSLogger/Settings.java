@@ -27,16 +27,16 @@ public class Settings
     private Resources res;
     private SharedPreferences pref;
 
-    public int minFreq()
+    public int minPeriod()
     {
-        return Integer.valueOf(pref.getString("min_freq",
-                                              res.getString(R.string.MinFreq)));
+        return Integer.valueOf(pref.getString("min_period",
+                                              res.getString(R.string.MinPeriod)));
     }
 
-    public int maxFreq()
+    public int maxPeriod()
     {
-        return Integer.valueOf(pref.getString("max_freq",
-                                              res.getString(R.string.MaxFreq)));
+        return Integer.valueOf(pref.getString("max_period",
+                                              res.getString(R.string.MaxPeriod)));
     }
 
     public float minDist()

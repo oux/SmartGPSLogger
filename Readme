@@ -11,14 +11,15 @@ does not need many power and try to get a global track during a trip.
 
  2 - Input:
 
-- minimum frequency ("min_freq" in minutes, default is 3)
-- maximum frequency ("max_freq" in minutes, default is 30)
+- minimum period ("min_period" in minutes, default is 3)
+- maximum period ("max_period" in minutes, default is 30)
 - distance tolerance ("min_dist" in meters, default is 100)
 - GPS fix timeout (in seconds, default is 120)
 
  3 - Output:
 
-Output data files are stored in /sdcard/SmartGPSLog/ (one file by day):
+Output data files are stored in /sdcard/SmartGPSLog/ (one file by
+day):
 
 - /sdcard/SmartGPSLog/2012:05:15.log
 - /sdcard/SmartGPSLog/[...]
@@ -34,15 +35,14 @@ On each wake-up, the application tries to get the current position and
 program its next wake-up as follow:
 
 - if getting the current position failed, the next wake-up is
-  programmed twice the current frequency majored by the "maximum"
-  frequency.
+  programmed twice the current period majored by the "maximum" period.
 
 - if the new position is close to the last one (see distance
-  tolerance), the next wake-up is programmed twice the current
-  frequency majored by the maximum frequency.
+  tolerance), the next wake-up is programmed twice the current period
+  majored by the maximum period.
 
 - if the new position is far away to the last one (see distance
-  tolerance), the next wake-up is programmed to the minimum frequency.
+  tolerance), the next wake-up is programmed to the minimum period.
 
 Once the SmartGPSLogger application is installed, the SmartGPSLogger
 service is automatically started on phone boot. There is a preference
@@ -51,13 +51,13 @@ checkbox to disable this feature.
  4.2 - Take battery level into account
 
 If the current battery level is comprise between 15 and 25, the
-current minimum frequency is equal to the minimum multiplied by two.
+current minimum period is equal to the minimum multiplied by two.
 
 If the current battery level is comprise between 8 and 15, the current
-minimum frequency is equal to the minimum multiplied by four.
+minimum period is equal to the minimum multiplied by four.
 
 If the current battery level is lower than 8, the current minimum
-frequency is equal to the minimum multiplied by height.
+period is equal to the minimum multiplied by height.
 
  5 - Documentation
 

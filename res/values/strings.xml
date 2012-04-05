@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Smart GPS Logger</string>
 
-    <string name="MinFreq">3</string>
-    <string name="MaxFreq">30</string>
+    <string name="MinPeriod">3</string>
+    <string name="MaxPeriod">30</string>
     <string name="MinDist">100</string>
     <string name="GpsTimeout">120</string>
     <string name="LocCacheSize">100</string>
@@ -15,11 +15,11 @@
     <string name="menu_settings">Settings</string>
 
     <!-- Preferences -->
-    <string name="title_minfreq_preference">Minimum frequency</string>
-    <string name="dialog_title_minfreq_preference">Minimum frequency</string>
+    <string name="title_minperiod_preference">Minimum period</string>
+    <string name="dialog_title_minperiod_preference">Minimum period</string>
 
-    <string name="title_maxfreq_preference">Maximum frequency</string>
-    <string name="dialog_title_maxfreq_preference">Maximum frequency</string>
+    <string name="title_maxperiod_preference">Maximum period</string>
+    <string name="dialog_title_maxperiod_preference">Maximum period</string>
 
     <string name="title_mindist_preference">Minimum distance</string>
     <string name="dialog_title_mindist_preference">Minimum distance</string>

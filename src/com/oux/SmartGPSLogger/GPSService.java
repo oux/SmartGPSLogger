@@ -174,7 +174,7 @@ public class GPSService extends Service implements LocationListener
 
         public void renew()
         {
-            GPSService.this.policy.setCurrentFreqToMin();
+            GPSService.this.policy.setCurrentPeriodToMin();
             GPSService.this.getNewLocation();
         }
 

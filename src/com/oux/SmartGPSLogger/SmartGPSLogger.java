@@ -150,7 +150,7 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
         else
             text.setText("Last GPS fix at + " + DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
 
-        if (lastGPSFixTime >= System.currentTimeMillis() - Settings.getInstance().maxFreq() * 60 * 1000)
+        if (lastGPSFixTime >= System.currentTimeMillis() - Settings.getInstance().maxPeriod() * 60 * 1000)
             text.setTextColor(Color.GREEN);
         else
             text.setTextColor(Color.RED);
