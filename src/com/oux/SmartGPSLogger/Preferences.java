@@ -1,17 +1,18 @@
 /*
- * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (C) 2012 Michel Sébastien & Jérémy Compostella
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.oux.SmartGPSLogger;
@@ -25,57 +26,67 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.EditTextPreference;
 import android.content.res.Resources;
+import android.util.Log;
+import android.preference.Preference.OnPreferenceChangeListener;
+import android.preference.Preference;
 
-/**
- * This activity is an example of a simple settings screen that has default
- * values.
- * <p>
- * In order for the default values to be populated into the
- * {@link SharedPreferences} (from the preferences XML file), the client must
- * call
- * {@link PreferenceManager#setDefaultValues(android.content.Context, int, boolean)}.
- * <p>
- * This should be called early, typically when the application is first created.
- * This ensures any of the application's activities, services, etc. will have
- * the default values present, even if the user has not wandered into the
- * application's settings. For ApiDemos, this is {@link ApiDemosApplication},
- * and you can find the call to
- * {@link PreferenceManager#setDefaultValues(android.content.Context, int, boolean)}
- * in its {@link ApiDemosApplication#onCreate() onCreate}.
- */
-public class Preferences extends PreferenceActivity {
+public class Preferences extends PreferenceActivity
+    implements OnPreferenceChangeListener
+{
+    private EditTextPreference minPeriod;
+    private EditTextPreference maxPeriod;
+    private EditTextPreference minDist;
+    private EditTextPreference gpsTimeout;
+    private EditTextPreference maxLoc;
+    private Resources res;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
 
         addPreferencesFromResource(R.xml.default_values);
 
-        SharedPreferences pref;
-        pref = PreferenceManager.getDefaultSharedPreferences(this);
-        Resources res = getResources();
-        EditTextPreference etp = (EditTextPreference) findPreference("min_period");
-        etp.setSummary("Default: " + res.getString(R.string.MinPeriod) +
-                       " minutes, current: " + pref.getString("min_period",
-                           res.getString(R.string.MinPeriod)) + " minutes");
-        etp = (EditTextPreference) findPreference("max_period");
-        etp.setSummary("Default: " + res.getString(R.string.MaxPeriod) +
-                       " minutes, current: " + pref.getString("max_period",
-                           res.getString(R.string.MaxPeriod)) + " minutes");
-        etp = (EditTextPreference) findPreference("min_dist");
-        etp.setSummary("Default: " + res.getString(R.string.MinDist) +
-                       " meters, current: " + pref.getString("min_dist",
-                           res.getString(R.string.MinDist)) + " meters");
-        etp = (EditTextPreference) findPreference("gps_timeout");
-        etp.setSummary("Default: " + res.getString(R.string.GpsTimeout) +
-                       " seconds, current: " + pref.getString("gps_timeout",
-                           res.getString(R.string.GpsTimeout)) + " seconds");
-        etp = (EditTextPreference) findPreference("max_loc");
-        etp.setSummary("Default: " + res.getString(R.string.LocCacheSize) +
-                       " locations, current: " + pref.getString("max_loc",
-                           res.getString(R.string.LocCacheSize)) + " locations");
+        res = getResources();
+        minPeriod = (EditTextPreference) findPreference("min_period");
+        minPeriod.setOnPreferenceChangeListener(this);
+        maxPeriod = (EditTextPreference) findPreference("max_period");
+        maxPeriod.setOnPreferenceChangeListener(this);
+        minDist = (EditTextPreference) findPreference("min_dist");
+        minDist.setOnPreferenceChangeListener(this);
+        gpsTimeout = (EditTextPreference) findPreference("gps_timeout");
+        gpsTimeout.setOnPreferenceChangeListener(this);
+        maxLoc = (EditTextPreference) findPreference("max_loc");
+        maxLoc.setOnPreferenceChangeListener(this);
+
+        onPreferenceChange(null, null);
     }
 
-}
+    public boolean onPreferenceChange(Preference preference, Object newVal)
+    {
+        EditTextPreference textPref = (EditTextPreference)preference;
+        minPeriod.setSummary("Default: " + res.getString(R.string.MinPeriod) +
+                             " minutes, current: " +
+                             (textPref == minPeriod ? (String)newVal : Settings.getInstance().minPeriod()) +
+                             " minutes");
+        maxPeriod.setSummary("Default: " + res.getString(R.string.MaxPeriod) +
+                             " minutes, current: " +
+                             (textPref == maxPeriod ? (String)newVal : Settings.getInstance().maxPeriod()) +
+                              " minutes");
+        minDist.setSummary("Default: " + res.getString(R.string.MinDist) +
+                           " meters, current: " +
+                           (textPref == minDist ? (String)newVal : Settings.getInstance().minDist()) +
+                            " meters");
+        gpsTimeout.setSummary("Default: " + res.getString(R.string.GpsTimeout) +
+                              " seconds, current: " +
+                              (textPref == gpsTimeout ? (String)newVal : Settings.getInstance().gpsTimeout()) +
+                               " seconds");
+        maxLoc.setSummary("Default: " + res.getString(R.string.LocCacheSize) +
+                          " locations, current: " +
+                          (textPref == maxLoc ? (String)newVal : Settings.getInstance().locCacheSize()) +
+                          " locations");
 
+        return true;
+    }
+}
 // vi:et
