@@ -11,7 +11,7 @@
   <com.google.android.maps.MapView android:id="@+id/map"
 				   android:layout_width="fill_parent"
 				   android:layout_height="wrap_content"
-				   android:apiKey="0a2TL5wCSguODqY0jNqfaokWnj5tr_3p61_Wt0Q"
+				   android:apiKey="0a2TL5wCSguN4ut3_KEN5Gq-PD94_3-3MF37z4g"
 				   android:enabled="true"
 				   android:clickable="true"
 				   android:layout_above="@+id/text_area" />
