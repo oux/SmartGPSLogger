@@ -133,6 +133,7 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
             return true;
         case MENU_STOPLOG:
             this.binder.stopUpdates();
+            updateText(binder.getLastGPSFixTime());
             Log.d(TAG, "stopped");
             return true;
         }
@@ -150,9 +151,17 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
         if (lastGPSFixTime == 0)
             text.setText("Last GPS fix information is not available");
         else
-            text.setText("Last GPS fix at + " + DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
+            text.setText("Last GPS fix at " +
+                         DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime) +
+                         " (UTC time)");
 
-        if (lastGPSFixTime >= System.currentTimeMillis() - Settings.getInstance().maxPeriod() * 60 * 1000)
+        if (binder != null && binder.isRunning())
+            text.append("\nService is running, next update at " +
+                        DateFormat.format("yyyy:MM:dd kk:mm:ss ", binder.getNextWakeUpTime()) +
+                        "(current period = " + binder.getCurrentPeriod() + " minutes)");
+
+        if (lastGPSFixTime >= System.currentTimeMillis() - Settings.getInstance().maxPeriod() * 60 * 1000 &&
+            binder != null && binder.isRunning())
             text.setTextColor(Color.GREEN);
         else
             text.setTextColor(Color.RED);

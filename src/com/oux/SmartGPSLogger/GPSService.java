@@ -136,11 +136,10 @@ public class GPSService extends Service implements LocationListener
         debug.log("new location found");
         timeout.cancel();
         lastGPSFixTime = System.currentTimeMillis();
-        Location prev = data.getLastLocation();
-        notifyNewLocation(loc);
         mLm.removeUpdates(GPSService.this);
         if (isRunning)
-            policy.setNextWakeUp(prev, loc);
+            policy.setNextWakeUp(data.getLastLocation(), loc);
+        notifyNewLocation(loc);
         wakelock.release();
     }
 
@@ -181,6 +180,16 @@ public class GPSService extends Service implements LocationListener
         public long getLastGPSFixTime()
         {
             return GPSService.this.lastGPSFixTime;
+        }
+
+        public long getNextWakeUpTime()
+        {
+            return policy.getNextWakeUpTime();
+        }
+
+        public int getCurrentPeriod()
+        {
+            return policy.getCurrentPeriod();
         }
 
         public void registerLocationUpdate(LocationUpdate updater)
