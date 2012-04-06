@@ -101,8 +101,10 @@ public class Policy extends BroadcastReceiver
             coef = 8.0;
         }
 
-        if (prevBatLevel != level)
+        if (prevBatLevel != level) {
+            prevBatLevel = level;
             debug.log("battery level = " + level);
+        }
     }
 
     /* Set the next wake-up taking into account the current location
