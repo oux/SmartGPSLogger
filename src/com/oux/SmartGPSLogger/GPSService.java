@@ -61,7 +61,7 @@ public class GPSService extends Service implements LocationListener
         Settings.getInstance(this);
 
         try {
-            debug = new Debug();
+            debug = new Debug(this);
             data = new GPSDataManager(this, debug);
         } catch (java.io.IOException e) {
             stopSelf();
