@@ -82,11 +82,19 @@ public class PathOverlay extends Overlay implements LocationUpdate
         super.draw(canvas, mapView, shadow);
         this.mapView = mapView;
 
-        if (points.size() < 2)
+        Projection projection = mapView.getProjection();
+
+        if (points.size() == 0)
             return;
+        if (points.size() == 1) {
+            Point p = new Point();
+            GeoPoint gP = points.getFirst();
+            projection.toPixels(gP, p);
+            canvas.drawPoint(p.x, p.y, pointPaint);
+            return;
+        }
 
         Path path = new Path();
-        Projection projection = mapView.getProjection();
         GeoPoint gP1 = points.getFirst();
         Point p1 = new Point();
         Point p2 = new Point();
