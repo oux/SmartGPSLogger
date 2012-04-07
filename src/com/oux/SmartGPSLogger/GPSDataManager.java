@@ -25,6 +25,7 @@ import java.io.BufferedWriter;
 import android.text.format.DateFormat;
 import android.util.Log;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import android.content.Context;
 import android.content.res.Resources;
 import java.io.RandomAccessFile;
@@ -42,10 +43,12 @@ public class GPSDataManager implements LocationUpdate
     private Debug debug;
     private String lastLocDate = null;
     private File file;
+    private File root;
     private BufferedWriter writer;
     private LinkedList<Location> locations;
     private Context mContext;
     private Resources mRes;
+    private boolean isAccessible = false;
 
     private void openCurrent() throws java.io.IOException
     {
@@ -82,7 +85,7 @@ public class GPSDataManager implements LocationUpdate
         mContext = context;
 
         locations = new LinkedList<Location>();
-        File root = Environment.getExternalStorageDirectory();
+        root = Environment.getExternalStorageDirectory();
         if (root.canWrite())
         {
             File dir = new File(DIR);
@@ -93,13 +96,15 @@ public class GPSDataManager implements LocationUpdate
             {
                 loadLocations();
                 openCurrent();
+                isAccessible = true;
             }
         }
     }
 
     protected void finalize() throws Throwable
     {
-        writer.close();
+        if (isAccessible && writer != null)
+            writer.close();
         super.finalize();
     }
 
@@ -113,52 +118,86 @@ public class GPSDataManager implements LocationUpdate
         return locations;
     }
 
+    private int lastWrittenIndex = 0;
+
+    private void writeLocation(Location loc, boolean tooClose)
+    {
+        if (isAccessible && !root.canWrite()) {
+            isAccessible = false;
+            writer = null;
+            lastWrittenIndex = locations.size() - 1;
+        } else if (!isAccessible && root.canWrite()) {
+            try {
+                openCurrent();
+                locations.removeLast();
+                ListIterator<Location> it = locations.listIterator(lastWrittenIndex);
+                locations = new LinkedList<Location>();
+                loadLocations();
+                isAccessible = true;
+                Location prev = getLastLocation();
+                while (it.hasNext()) {
+                    Location cur = it.next();
+                    newLocation(cur);
+                    prev = cur;
+                }
+            } catch (java.io.IOException e) {
+                isAccessible = false;
+            }
+        }
+
+        if (isAccessible) {
+            String newLocDate = DateFormat.format(FMT, loc.getTime()).toString();
+
+            if (lastLocDate == null)
+                lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
+
+            if (!lastLocDate.equals(newLocDate))
+                {
+                    try {
+                        debug.log("Process file rotation");
+                        writer.close();
+                        file.renameTo(new File(DIR + lastLocDate + SUFFIX));
+                        lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
+                        openCurrent();
+                    } catch (java.io.IOException e) {
+                        debug.log("File rotation failed : " + e.toString());
+                    }
+                }
+
+            String newLine = DateFormat.format("yyyy:MM:dd", loc.getTime()) +
+                "," + DateFormat.format("kk:mm:ss", loc.getTime()) +
+                "," + loc.getLatitude() +
+                "," + loc.getLongitude() +
+                "," + loc.getSpeed() +
+                "," + loc.getAltitude() +
+                "," + tooClose;
+
+            if (writer != null) {
+                try {
+                    writer.write(newLine  + "\n");
+                    writer.flush();
+                } catch (java.io.IOException e) {
+                    debug.log("Failed to write location data : " +
+                              e.toString());
+                }
+            }
+            debug.log(newLine);
+        }
+    }
+
     public void newLocation(Location loc)
     {
         Location prev = getLastLocation();
 
         boolean tooClose = false;
-        if (prev.distanceTo(loc) <= Settings.getInstance().minDist())
+        if (prev != null &&
+            prev.distanceTo(loc) <= Settings.getInstance().minDist())
             tooClose = true;
 
         locations.add(loc);
         if (locations.size() > Settings.getInstance().locCacheSize())
             locations.removeFirst();
 
-        String newLocDate = DateFormat.format(FMT, loc.getTime()).toString();
-
-        if (lastLocDate == null)
-            lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
-
-        if (!lastLocDate.equals(newLocDate))
-        {
-            try {
-                debug.log("Process file rotation");
-                writer.close();
-                file.renameTo(new File(DIR + lastLocDate + SUFFIX));
-                lastLocDate = DateFormat.format(FMT, loc.getTime()).toString();
-                openCurrent();
-            } catch (java.io.IOException e) {
-                debug.log("File rotation failed : " + e.toString());
-            }
-        }
-
-        String newLine = DateFormat.format("yyyy:MM:dd", loc.getTime()) +
-            "," + DateFormat.format("kk:mm:ss", loc.getTime()) +
-            "," + loc.getLatitude() +
-            "," + loc.getLongitude() +
-            "," + loc.getSpeed() +
-            "," + loc.getAltitude() +
-            "," + tooClose;
-
-        try {
-            writer.write(newLine  + "\n");
-            writer.flush();
-        } catch (java.io.IOException e) {
-            debug.log("Failed to write location data : " +
-                      e.toString());
-        }
-
-        debug.log(newLine);
+        writeLocation(loc, tooClose);
     }
 }
