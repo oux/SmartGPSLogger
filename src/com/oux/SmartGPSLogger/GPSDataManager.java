@@ -57,6 +57,8 @@ public class GPSDataManager implements LocationUpdate
     {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         File file = new File(CURRENT);
+        if (!file.exists())
+            return;
         RandomAccessFile reader = new RandomAccessFile(file, "r");
         String line;
         if (file.length() > 80 * Settings.getInstance().locCacheSize()) {
