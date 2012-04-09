@@ -36,6 +36,8 @@ import android.graphics.Color;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 import android.text.format.DateFormat;
+import android.os.Handler;
+import android.os.Message;
 
 public class SmartGPSLogger extends MapActivity implements LocationUpdate
 {
@@ -141,9 +143,15 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
         return super.onOptionsItemSelected(item);
     }
 
+    private Handler handler = new Handler() {
+            public void handleMessage(Message msg) {
+                SmartGPSLogger.this.updateText(binder != null ? binder.getLastGPSFixTime() : 0);
+            }
+        };
+
     public void newLocation(Location loc)
     {
-        updateText(System.currentTimeMillis());
+        handler.sendEmptyMessage(0);
     }
 
     private void updateText(long lastGPSFixTime)
@@ -152,8 +160,7 @@ public class SmartGPSLogger extends MapActivity implements LocationUpdate
             text.setText("Last GPS fix information is not available");
         else
             text.setText("Last GPS fix at " +
-                         DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime) +
-                         " (UTC time)");
+                         DateFormat.format("yyyy:MM:dd kk:mm:ss", lastGPSFixTime));
 
         if (binder != null && binder.isRunning())
             text.append("\nService is running, next update at " +

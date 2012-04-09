@@ -187,6 +187,9 @@ public class GPSDataManager implements LocationUpdate
 
     public void newLocation(Location loc)
     {
+        if (loc == null)
+            return;
+
         Location prev = getLastLocation();
 
         boolean tooClose = false;

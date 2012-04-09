@@ -116,6 +116,7 @@ public class GPSService extends Service implements LocationListener
         mLm.removeUpdates(GPSService.this);
         if (isRunning)
             policy.setNextWakeUp(data.getLastLocation(), null);
+        notifyNewLocation(null);
         wakelock.release();
     }
 
