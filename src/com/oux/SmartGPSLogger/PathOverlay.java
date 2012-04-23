@@ -29,6 +29,7 @@ import com.google.android.maps.MapView;
 import android.location.Location;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import android.view.MotionEvent;
 
 public class PathOverlay extends Overlay implements LocationUpdate
 {
@@ -37,6 +38,7 @@ public class PathOverlay extends Overlay implements LocationUpdate
     private MapView mapView;
     private Paint pathPaint;
     private Paint pointPaint;
+    private long prevTime;
 
     public PathOverlay(LinkedList<Location> locations)
     {
@@ -116,5 +118,16 @@ public class PathOverlay extends Overlay implements LocationUpdate
 
         canvas.drawPath(path, pathPaint);
         canvas.drawPoint(p2.x, p2.y, pointPaint);
+    }
+
+    public boolean onTouchEvent(MotionEvent e, MapView mapView)
+    {
+        if (e.getPointerCount() == 1 && e.getAction() == MotionEvent.ACTION_DOWN) {
+            long curTime = System.currentTimeMillis();
+            if (curTime - prevTime < 1000)
+                mapView.getController().animateTo(points.getLast());
+            prevTime = curTime;
+        }
+        return super.onTouchEvent(e, mapView);
     }
 }
