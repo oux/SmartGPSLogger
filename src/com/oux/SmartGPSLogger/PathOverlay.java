@@ -124,7 +124,7 @@ public class PathOverlay extends Overlay implements LocationUpdate
     {
         if (e.getPointerCount() == 1 && e.getAction() == MotionEvent.ACTION_DOWN) {
             long curTime = System.currentTimeMillis();
-            if (curTime - prevTime < 1000)
+            if (curTime - prevTime < 1000 && points.getLast() != null)
                 mapView.getController().animateTo(points.getLast());
             prevTime = curTime;
         }
